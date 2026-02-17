@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Board of Trustees Portal</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -26,26 +26,35 @@
             --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            html { font-size: 14px; }
+        }
 
         /* Login Screen */
         .login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             display: flex; align-items: center; justify-content: center; z-index: 1000;
+            padding: 1rem;
         }
         .login-container {
-            background: var(--card); padding: 3rem; border-radius: 16px;
+            background: var(--card); padding: 2rem; border-radius: 16px;
             box-shadow: var(--shadow-lg); width: 100%; max-width: 450px; text-align: center;
         }
-        .login-logo {
-            width: 80px; height: 80px; background: var(--primary); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 1.5rem; color: white; font-size: 2rem;
+        @media (max-width: 480px) {
+            .login-container { padding: 1.5rem; border-radius: 12px; }
         }
-        .login-container h1 { font-size: 1.75rem; margin-bottom: 0.5rem; color: var(--text); }
-        .login-container p { color: var(--text-light); margin-bottom: 2rem; }
+        .login-logo {
+            width: 70px; height: 70px; background: var(--primary); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem; color: white; font-size: 1.75rem;
+        }
+        .login-container h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text); }
+        .login-container p { color: var(--text-light); margin-bottom: 1.5rem; font-size: 0.9rem; }
 
         .form-group { margin-bottom: 1.25rem; text-align: left; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.875rem; }
@@ -61,7 +70,9 @@
             display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
             padding: 0.75rem 1.5rem; border: none; border-radius: 8px;
             font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+            touch-action: manipulation;
         }
+        .btn:active { transform: scale(0.98); }
         .btn-primary { background: var(--primary); color: white; width: 100%; }
         .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: var(--shadow); }
         .btn-secondary { background: var(--bg); color: var(--text); }
@@ -73,63 +84,143 @@
         .role-selector {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;
         }
+        @media (max-width: 480px) {
+            .role-selector { grid-template-columns: 1fr; }
+        }
         .role-option {
             padding: 1rem; border: 2px solid var(--border); border-radius: 8px;
             cursor: pointer; transition: all 0.3s ease; text-align: center;
         }
         .role-option:hover, .role-option.active { border-color: var(--primary); background: #eff6ff; }
-        .role-option i { font-size: 1.5rem; margin-bottom: 0.5rem; display: block; color: var(--primary); }
-        .role-option span { font-size: 0.875rem; font-weight: 500; }
+        .role-option i { font-size: 1.25rem; margin-bottom: 0.5rem; display: block; color: var(--primary); }
+        .role-option span { font-size: 0.8rem; font-weight: 500; }
 
         /* Main Layout */
         .app-container { display: none; min-height: 100vh; }
+        
+        /* Sidebar - Mobile Optimized */
         .sidebar {
             position: fixed; left: 0; top: 0; width: 280px; height: 100vh;
             background: var(--card); border-right: 1px solid var(--border);
             display: flex; flex-direction: column; z-index: 100; overflow-y: auto;
+            transition: transform 0.3s ease;
         }
-        .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 1rem; }
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: var(--shadow-lg);
+            }
+            .sidebar.active { transform: translateX(0); }
+        }
+        .sidebar-header { 
+            padding: 1.25rem; 
+            border-bottom: 1px solid var(--border); 
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem; 
+        }
         .sidebar-logo {
-            width: 48px; height: 48px; background: var(--primary); border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;
+            width: 40px; height: 40px; background: var(--primary); border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; color: white; font-size: 1.25rem;
         }
-        .sidebar-brand h2 { font-size: 1.25rem; font-weight: 700; color: var(--primary); }
-        .sidebar-brand span { font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; }
+        .sidebar-brand h2 { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .sidebar-brand span { font-size: 0.7rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; }
 
-        .nav-menu { flex: 1; padding: 1rem 0; }
+        .nav-menu { flex: 1; padding: 1rem 0; overflow-y: auto; }
         .nav-item {
-            display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.5rem;
+            display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem;
             color: var(--text-light); text-decoration: none; transition: all 0.3s ease;
-            border-left: 3px solid transparent; cursor: pointer;
+            border-left: 3px solid transparent; cursor: pointer; font-size: 0.9rem;
         }
         .nav-item:hover, .nav-item.active { background: #eff6ff; color: var(--primary); border-left-color: var(--primary); }
-        .nav-item i { width: 24px; text-align: center; }
+        .nav-item i { width: 20px; text-align: center; }
         .nav-badge {
             margin-left: auto; background: var(--danger); color: white;
-            font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 9999px;
+            font-size: 0.7rem; padding: 0.125rem 0.5rem; border-radius: 9999px;
         }
 
-        .sidebar-footer { padding: 1.5rem; border-top: 1px solid var(--border); }
-        .user-profile { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .sidebar-footer { padding: 1.25rem; border-top: 1px solid var(--border); }
+        .user-profile { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
         .user-avatar {
-            width: 40px; height: 40px; background: var(--primary-light); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;
+            width: 36px; height: 36px; background: var(--primary-light); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.875rem;
         }
-        .user-info h4 { font-size: 0.875rem; font-weight: 600; }
-        .user-info span { font-size: 0.75rem; color: var(--text-light); }
+        .user-info h4 { font-size: 0.8rem; font-weight: 600; }
+        .user-info span { font-size: 0.7rem; color: var(--text-light); }
 
-        .main-content { margin-left: 280px; padding: 2rem; min-height: 100vh; }
+        /* Overlay for mobile sidebar */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 99;
+        }
+        @media (max-width: 1024px) {
+            .sidebar-overlay.active { display: block; }
+        }
+
+        /* Main Content */
+        .main-content { margin-left: 280px; padding: 1.5rem; min-height: 100vh; }
+        @media (max-width: 1024px) {
+            .main-content { margin-left: 0; padding: 1rem; padding-top: 4rem; }
+        }
+
+        /* Top Bar - Mobile Optimized */
         .top-bar {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+            gap: 1rem;
         }
-        .page-title h1 { font-size: 1.875rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .page-title p { color: var(--text-light); }
-        .top-actions { display: flex; gap: 1rem; align-items: center; }
+        @media (max-width: 768px) {
+            .top-bar { flex-wrap: wrap; }
+            .page-title { width: 100%; order: 2; }
+        }
+        .page-title h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .page-title p { color: var(--text-light); font-size: 0.875rem; }
+        .top-actions { display: flex; gap: 0.75rem; align-items: center; }
+        
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--card);
+            border-radius: 8px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 98;
+        }
+        @media (max-width: 1024px) {
+            .menu-toggle { display: flex; }
+        }
+
         .search-box { position: relative; }
         .search-box input {
             padding: 0.625rem 1rem 0.625rem 2.5rem; border: 2px solid var(--border);
-            border-radius: 8px; width: 300px; font-size: 0.875rem;
+            border-radius: 8px; width: 250px; font-size: 0.875rem;
+        }
+        @media (max-width: 768px) {
+            .search-box { display: none; }
+            .search-box.mobile-visible {
+                display: block;
+                position: fixed;
+                top: 4rem;
+                left: 1rem;
+                right: 1rem;
+                z-index: 97;
+                width: auto;
+            }
+            .search-box.mobile-visible input { width: 100%; }
         }
         .search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-light); }
         .notification-btn {
@@ -142,99 +233,125 @@
             width: 8px; height: 8px; background: var(--danger); border-radius: 50%;
         }
 
-        /* Dashboard */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        /* Dashboard - Responsive Grid */
+        .dashboard-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 1rem; 
+            margin-bottom: 1.5rem; 
+        }
+        @media (max-width: 1200px) { .dashboard-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 480px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        
         .stat-card {
-            background: var(--card); padding: 1.5rem; border-radius: 12px;
+            background: var(--card); padding: 1.25rem; border-radius: 12px;
             box-shadow: var(--shadow); border-left: 4px solid var(--primary);
         }
         .stat-card.warning { border-left-color: var(--warning); }
         .stat-card.success { border-left-color: var(--success); }
         .stat-card.danger { border-left-color: var(--danger); }
         .stat-card.purple { border-left-color: var(--purple); }
-        .stat-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; }
+        .stat-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem; }
         .stat-icon {
-            width: 48px; height: 48px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
         }
         .stat-icon.blue { background: #dbeafe; color: var(--primary); }
         .stat-icon.orange { background: #fef3c7; color: var(--warning); }
         .stat-icon.green { background: #d1fae5; color: var(--success); }
         .stat-icon.red { background: #fee2e2; color: var(--danger); }
         .stat-icon.purple { background: #ede9fe; color: var(--purple); }
-        .stat-value { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .stat-label { color: var(--text-light); font-size: 0.875rem; }
+        .stat-value { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-label { color: var(--text-light); font-size: 0.8rem; }
 
         .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+        @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } }
+        
         .card {
             background: var(--card); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden;
+            margin-bottom: 1rem;
         }
         .card-header {
-            padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+            padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
-        .card-header h3 { font-size: 1.125rem; font-weight: 600; }
-        .card-body { padding: 1.5rem; }
+        .card-header h3 { font-size: 1rem; font-weight: 600; }
+        .card-body { padding: 1.25rem; }
 
         .module-section { display: none; }
         .module-section.active { display: block; }
 
-        /* Committees */
-        .committee-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        /* Committees - Responsive */
+        .committee-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 1rem; 
+            margin-bottom: 1.5rem; 
+        }
+        @media (max-width: 640px) { .committee-grid { grid-template-columns: 1fr; } }
+        
         .committee-card {
             background: var(--card); border-radius: 12px; box-shadow: var(--shadow);
             overflow: hidden; transition: all 0.3s ease; border: 2px solid transparent;
         }
         .committee-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
         .committee-header {
-            padding: 1.5rem; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white;
+            padding: 1.25rem; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white;
         }
         .committee-header.property { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
         .committee-header.fig { background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%); }
         .committee-header.people { background: linear-gradient(135deg, #db2777 0%, #ec4899 100%); }
-        .committee-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .committee-subtitle { font-size: 0.875rem; opacity: 0.9; }
-        .committee-body { padding: 1.5rem; }
-        .committee-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; text-align: center; }
-        .committee-stat { padding: 0.75rem; background: var(--bg); border-radius: 8px; }
-        .committee-stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
-        .committee-stat-label { font-size: 0.75rem; color: var(--text-light); }
+        .committee-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .committee-subtitle { font-size: 0.8rem; opacity: 0.9; }
+        .committee-body { padding: 1.25rem; }
+        .committee-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem; text-align: center; }
+        .committee-stat { padding: 0.5rem; background: var(--bg); border-radius: 8px; }
+        .committee-stat-value { font-size: 1.25rem; font-weight: 700; color: var(--primary); }
+        .committee-stat-label { font-size: 0.7rem; color: var(--text-light); }
         .member-list { display: flex; margin-bottom: 1rem; }
         .member-avatar {
-            width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light);
+            width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light);
             display: flex; align-items: center; justify-content: center; color: white;
-            font-size: 0.75rem; font-weight: 600; border: 2px solid white; margin-left: -0.5rem;
+            font-size: 0.7rem; font-weight: 600; border: 2px solid white; margin-left: -0.5rem;
         }
         .member-avatar:first-child { margin-left: 0; }
 
         .workflow-status {
             display: inline-flex; align-items: center; gap: 0.5rem;
-            padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; margin-top: 1rem;
+            padding: 0.5rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; margin-top: 1rem;
         }
         .workflow-pending { background: #fef3c7; color: var(--warning); }
         .workflow-approved { background: #d1fae5; color: var(--success); }
         .workflow-board { background: #dbeafe; color: var(--primary); }
 
-        /* Meetings */
+        /* Meetings - Responsive Tabs */
         .meeting-tabs {
             display: flex; gap: 0.5rem; margin-bottom: 1.5rem;
             background: var(--bg); padding: 0.5rem; border-radius: 12px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
+        .meeting-tabs::-webkit-scrollbar { display: none; }
         .meeting-tab {
-            padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer;
+            padding: 0.625rem 1rem; border-radius: 8px; cursor: pointer;
             transition: all 0.3s ease; font-weight: 500; border: none; background: transparent;
+            white-space: nowrap;
+            font-size: 0.875rem;
         }
         .meeting-tab.active { background: white; box-shadow: var(--shadow); color: var(--primary); }
         .meeting-tab:hover:not(.active) { background: rgba(255,255,255,0.5); }
         .meeting-type-badge {
             display: inline-flex; align-items: center; gap: 0.5rem;
-            padding: 0.375rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;
+            padding: 0.25rem 0.625rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600;
         }
         .type-board { background: #dbeafe; color: var(--primary); }
         .type-committee { background: #d1fae5; color: var(--success); }
         .type-extraordinary { background: #fee2e2; color: var(--danger); }
 
-        /* Checklist */
+        /* Checklist Items */
         .checklist-item {
             display: flex; align-items: center; gap: 1rem; padding: 1rem;
             border-bottom: 1px solid var(--border); transition: all 0.3s ease;
@@ -242,63 +359,87 @@
         .checklist-item:last-child { border-bottom: none; }
         .checklist-item.completed { background: #f0fdf4; }
         .checklist-checkbox {
-            width: 24px; height: 24px; border: 2px solid var(--border); border-radius: 6px;
+            width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 6px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.3s ease; flex-shrink: 0;
         }
         .checklist-item.completed .checklist-checkbox { background: var(--success); border-color: var(--success); color: white; }
-        .checklist-content { flex: 1; }
-        .checklist-content h4 { font-weight: 600; margin-bottom: 0.25rem; }
-        .checklist-content p { font-size: 0.875rem; color: var(--text-light); }
+        .checklist-content { flex: 1; min-width: 0; }
+        .checklist-content h4 { font-weight: 600; margin-bottom: 0.25rem; font-size: 0.9rem; }
+        .checklist-content p { font-size: 0.8rem; color: var(--text-light); }
         .checklist-due { font-size: 0.75rem; color: var(--danger); font-weight: 500; }
 
         /* Training */
-        .training-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        .training-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+        @media (max-width: 640px) { .training-grid { grid-template-columns: 1fr; } }
+        
         .training-card {
             background: var(--card); border-radius: 12px; overflow: hidden;
             box-shadow: var(--shadow); transition: all 0.3s ease;
         }
         .training-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
         .training-thumbnail {
-            height: 160px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;
+            height: 140px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem;
         }
-        .training-info { padding: 1.5rem; }
-        .training-info h3 { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .training-info { padding: 1.25rem; }
+        .training-info h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
         .training-meta {
             display: flex; justify-content: space-between; align-items: center;
             margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);
         }
-        .training-duration { font-size: 0.875rem; color: var(--text-light); }
+        .training-duration { font-size: 0.8rem; color: var(--text-light); }
 
-        /* Calendar */
-        .calendar-container { background: var(--card); border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow); }
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        /* Calendar - Responsive */
+        .calendar-container { background: var(--card); border-radius: 12px; padding: 1.25rem; box-shadow: var(--shadow); }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .calendar-header h3 { font-size: 1.1rem; }
         .calendar-nav { display: flex; gap: 0.5rem; }
         .calendar-nav button {
-            width: 36px; height: 36px; border: 1px solid var(--border); background: white;
+            width: 32px; height: 32px; border: 1px solid var(--border); background: white;
             border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; }
         .calendar-day-header {
-            text-align: center; font-weight: 600; font-size: 0.875rem;
+            text-align: center; font-weight: 600; font-size: 0.75rem;
             color: var(--text-light); padding: 0.5rem;
         }
         .calendar-day {
-            aspect-ratio: 1; border: 1px solid var(--border); border-radius: 8px;
-            padding: 0.5rem; cursor: pointer; transition: all 0.3s ease; position: relative;
+            aspect-ratio: 1; border: 1px solid var(--border); border-radius: 6px;
+            padding: 0.25rem; cursor: pointer; transition: all 0.3s ease; position: relative;
+            font-size: 0.8rem; display: flex; align-items: center; justify-content: center;
         }
         .calendar-day:hover { background: #eff6ff; border-color: var(--primary); }
         .calendar-day.has-event::after {
             content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
-            width: 6px; height: 6px; background: var(--primary); border-radius: 50%;
+            width: 4px; height: 4px; background: var(--primary); border-radius: 50%;
         }
         .calendar-day.today { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* Messaging */
+        /* Messaging - Mobile Optimized */
         .messaging-layout {
-            display: grid; grid-template-columns: 300px 1fr; height: 600px;
+            display: grid; grid-template-columns: 280px 1fr; height: 600px;
             background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow);
+        }
+        @media (max-width: 768px) {
+            .messaging-layout { 
+                grid-template-columns: 1fr; 
+                height: calc(100vh - 150px);
+                position: relative;
+            }
+            .conversations-list { 
+                position: absolute; 
+                width: 100%; 
+                height: 100%; 
+                z-index: 2;
+                background: var(--card);
+                transition: transform 0.3s ease;
+            }
+            .conversations-list.hidden { transform: translateX(-100%); }
+            .chat-area { z-index: 1; }
+            .back-btn {
+                display: flex !important;
+            }
         }
         .conversations-list { border-right: 1px solid var(--border); overflow-y: auto; }
         .conversation-item {
@@ -306,25 +447,41 @@
             cursor: pointer; transition: all 0.3s ease;
         }
         .conversation-item:hover, .conversation-item.active { background: #eff6ff; }
-        .conversation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-        .conversation-name { font-weight: 600; }
-        .conversation-time { font-size: 0.75rem; color: var(--text-light); }
+        .conversation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }
+        .conversation-name { font-weight: 600; font-size: 0.9rem; }
+        .conversation-time { font-size: 0.7rem; color: var(--text-light); }
         .conversation-preview {
-            font-size: 0.875rem; color: var(--text-light);
+            font-size: 0.8rem; color: var(--text-light);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .chat-area { display: flex; flex-direction: column; }
-        .chat-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); font-weight: 600; }
+        .chat-header { 
+            padding: 1rem 1.25rem; 
+            border-bottom: 1px solid var(--border); 
+            font-weight: 600; 
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .back-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
         .chat-messages {
-            flex: 1; overflow-y: auto; padding: 1.5rem;
+            flex: 1; overflow-y: auto; padding: 1.25rem;
             display: flex; flex-direction: column; gap: 1rem;
         }
-        .message { max-width: 70%; padding: 1rem; border-radius: 12px; position: relative; }
+        .message { max-width: 85%; padding: 0.875rem; border-radius: 12px; position: relative; font-size: 0.9rem; }
+        @media (min-width: 768px) { .message { max-width: 70%; } }
         .message.sent { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
         .message.received { align-self: flex-start; background: var(--bg); border-bottom-left-radius: 4px; }
-        .message-time { font-size: 0.75rem; opacity: 0.7; margin-top: 0.5rem; }
-        .chat-input { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 1rem; }
-        .chat-input input { flex: 1; padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 8px; }
+        .message-time { font-size: 0.7rem; opacity: 0.7; margin-top: 0.25rem; }
+        .chat-input { padding: 1rem 1.25rem; border-top: 1px solid var(--border); display: flex; gap: 0.75rem; }
+        .chat-input input { flex: 1; padding: 0.625rem 1rem; border: 2px solid var(--border); border-radius: 8px; }
 
         /* Tasks */
         .task-item {
@@ -332,64 +489,70 @@
             border-bottom: 1px solid var(--border); transition: all 0.3s ease;
         }
         .task-item:hover { background: var(--bg); }
-        .task-priority { width: 4px; height: 40px; border-radius: 2px; }
+        .task-priority { width: 4px; height: 40px; border-radius: 2px; flex-shrink: 0; }
         .priority-high { background: var(--danger); }
         .priority-medium { background: var(--warning); }
         .priority-low { background: var(--success); }
-        .task-content { flex: 1; }
-        .task-title { font-weight: 600; margin-bottom: 0.25rem; }
-        .task-meta { font-size: 0.875rem; color: var(--text-light); }
+        .task-content { flex: 1; min-width: 0; }
+        .task-title { font-weight: 600; margin-bottom: 0.25rem; font-size: 0.9rem; }
+        .task-meta { font-size: 0.8rem; color: var(--text-light); }
         .task-assignee { display: flex; align-items: center; gap: 0.5rem; }
         .assignee-avatar {
-            width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light);
+            width: 28px; height: 28px; border-radius: 50%; background: var(--primary-light);
             display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 0.75rem; font-weight: 600;
+            color: white; font-size: 0.7rem; font-weight: 600;
         }
 
         /* Documents */
-        .document-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+        .document-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+        @media (max-width: 480px) { .document-grid { grid-template-columns: 1fr; } }
+        
         .document-card {
             background: var(--card); border: 2px solid var(--border); border-radius: 12px;
-            padding: 1.5rem; transition: all 0.3s ease; cursor: pointer;
+            padding: 1.25rem; transition: all 0.3s ease; cursor: pointer;
         }
         .document-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
         .doc-icon {
-            width: 48px; height: 48px; background: #fee2e2; border-radius: 8px;
+            width: 40px; height: 40px; background: #fee2e2; border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
-            color: var(--danger); font-size: 1.5rem; margin-bottom: 1rem;
+            color: var(--danger); font-size: 1.25rem; margin-bottom: 0.75rem;
         }
         .doc-icon.pdf { background: #fee2e2; color: var(--danger); }
         .doc-icon.doc { background: #dbeafe; color: var(--primary); }
         .doc-icon.sheet { background: #d1fae5; color: var(--success); }
-        .doc-title { font-weight: 600; margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .doc-meta { font-size: 0.875rem; color: var(--text-light); }
+        .doc-title { font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .doc-meta { font-size: 0.75rem; color: var(--text-light); line-height: 1.4; }
 
-        /* Policies */
+        /* Policies - Responsive Table */
         .policy-table { width: 100%; border-collapse: collapse; }
         .policy-table th, .policy-table td {
             padding: 1rem; text-align: left; border-bottom: 1px solid var(--border);
         }
         .policy-table th {
-            font-weight: 600; color: var(--text-light); font-size: 0.875rem;
+            font-weight: 600; color: var(--text-light); font-size: 0.75rem;
             text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        @media (max-width: 768px) {
+            .policy-table { display: block; overflow-x: auto; white-space: nowrap; }
         }
         .policy-status {
             display: inline-flex; align-items: center; gap: 0.5rem;
-            padding: 0.375rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;
+            padding: 0.25rem 0.625rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600;
         }
         .status-active { background: #d1fae5; color: var(--success); }
         .status-review { background: #fef3c7; color: var(--warning); }
         .status-expired { background: #fee2e2; color: var(--danger); }
 
-        /* Modal */
+        /* Modal - Mobile Optimized */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.5); display: none;
             align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);
+            padding: 1rem;
         }
         .modal-overlay.active { display: flex; }
         .modal {
-            background: var(--card); border-radius: 16px; width: 90%; max-width: 700px;
+            background: var(--card); border-radius: 16px; width: 100%; max-width: 600px;
             max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg);
             animation: modalSlide 0.3s ease;
         }
@@ -398,29 +561,35 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .modal-header {
-            padding: 1.5rem; border-bottom: 1px solid var(--border);
+            padding: 1.25rem; border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .modal-header h2 { font-size: 1.25rem; font-weight: 600; }
+        .modal-header h2 { font-size: 1.1rem; font-weight: 600; }
         .modal-close {
             width: 32px; height: 32px; border: none; background: var(--bg);
             border-radius: 8px; cursor: pointer;
             display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
         }
         .modal-close:hover { background: var(--border); }
-        .modal-body { padding: 1.5rem; }
-        .modal-footer { padding: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 1rem; }
+        .modal-body { padding: 1.25rem; }
+        .modal-footer { padding: 1.25rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; }
 
-        /* Toast */
+        /* Toast - Mobile Safe Position */
         .toast-container {
-            position: fixed; top: 2rem; right: 2rem; z-index: 1001;
-            display: flex; flex-direction: column; gap: 1rem;
+            position: fixed; top: 1rem; right: 1rem; z-index: 1001;
+            display: flex; flex-direction: column; gap: 0.75rem;
+            max-width: calc(100% - 2rem);
+        }
+        @media (max-width: 480px) {
+            .toast-container { left: 1rem; right: 1rem; }
         }
         .toast {
-            background: var(--card); padding: 1rem 1.5rem; border-radius: 12px;
-            box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 1rem;
-            min-width: 300px; animation: slideIn 0.3s ease; border-left: 4px solid var(--success);
+            background: var(--card); padding: 1rem 1.25rem; border-radius: 12px;
+            box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 0.75rem;
+            border-left: 4px solid var(--success);
+            animation: slideIn 0.3s ease;
         }
+        @media (max-width: 480px) { .toast { width: 100%; } }
         .toast.error { border-left-color: var(--danger); }
         .toast.warning { border-left-color: var(--warning); }
         @keyframes slideIn {
@@ -444,6 +613,54 @@
         .justify-between { justify-content: space-between; }
         .mb-4 { margin-bottom: 1rem; }
         .mt-4 { margin-top: 1rem; }
+        
+        /* Recruitment Job Cards */
+        .job-card {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .job-title { font-weight: 700; color: var(--primary); font-size: 1rem; }
+        .job-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+            flex-wrap: wrap;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-open { background: #d1fae5; color: var(--success); }
+        .status-review { background: #fef3c7; color: var(--warning); }
+        .status-active { background: #dbeafe; color: var(--primary); }
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            margin-top: 0.75rem;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
     </style>
 <base target="_blank">
 </head>
@@ -478,7 +695,7 @@
                 <i class="fas fa-sign-in-alt"></i> Sign In Securely
             </button>
 
-            <p style="margin-top: 1.5rem; font-size: 0.875rem; color: var(--text-light);">
+            <p style="margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-light);">
                 <i class="fas fa-lock"></i> Secured with 256-bit encryption & 2FA
             </p>
         </div>
@@ -486,6 +703,14 @@
 
     <!-- Main Application -->
     <div class="app-container" id="appContainer">
+        <!-- Mobile Menu Toggle -->
+        <button class="menu-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -525,13 +750,13 @@
                     <i class="fas fa-tasks"></i><span>Tasks</span>
                 </a>
                 <a class="nav-item" onclick="showModule('minutes')">
-                    <i class="fas fa-file-alt"></i><span>Minutes & Records</span>
+                    <i class="fas fa-file-alt"></i><span>Minutes</span>
                 </a>
                 <a class="nav-item" onclick="showModule('policies')">
                     <i class="fas fa-book"></i><span>Policies</span><span class="nav-badge admin-only">1</span>
                 </a>
                 <a class="nav-item admin-only" onclick="showModule('admin')">
-                    <i class="fas fa-cog"></i><span>Admin Settings</span>
+                    <i class="fas fa-cog"></i><span>Admin</span>
                 </a>
             </nav>
 
@@ -558,9 +783,9 @@
                     <p id="pageSubtitle">Welcome back, here's what's happening</p>
                 </div>
                 <div class="top-actions">
-                    <div class="search-box">
+                    <div class="search-box" id="searchBox">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Search portal...">
+                        <input type="text" placeholder="Search portal..." onfocus="toggleSearchMobile()" onblur="toggleSearchMobile()">
                     </div>
                     <button class="notification-btn" onclick="showNotifications()">
                         <i class="fas fa-bell"></i>
@@ -602,7 +827,7 @@
                         <div class="stat-header">
                             <div>
                                 <div class="stat-value">2</div>
-                                <div class="stat-label">Items for Approval</div>
+                                <div class="stat-label">For Approval</div>
                             </div>
                             <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
                         </div>
@@ -613,21 +838,21 @@
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="fas fa-clock"></i> Recent Activity</h3>
-                            <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">View All</button>
+                            <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View All</button>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="padding: 0;">
                             <div class="checklist-item">
                                 <div class="checklist-checkbox" style="background: var(--success); color: white; border-color: var(--success);">
-                                    <i class="fas fa-check"></i>
+                                    <i class="fas fa-check" style="font-size: 0.7rem;"></i>
                                 </div>
                                 <div class="checklist-content">
-                                    <h4>Property Committee minutes approved for Board</h4>
+                                    <h4>Property Committee minutes approved</h4>
                                     <p>2 hours ago • Workflow</p>
                                 </div>
                             </div>
                             <div class="checklist-item">
                                 <div class="checklist-checkbox" style="background: var(--success); color: white; border-color: var(--success);">
-                                    <i class="fas fa-check"></i>
+                                    <i class="fas fa-check" style="font-size: 0.7rem;"></i>
                                 </div>
                                 <div class="checklist-content">
                                     <h4>Joined Finance & Governance Committee</h4>
@@ -635,9 +860,9 @@
                                 </div>
                             </div>
                             <div class="checklist-item">
-                                <div class="checklist-checkbox"><i class="fas fa-check"></i></div>
+                                <div class="checklist-checkbox"><i class="fas fa-check" style="font-size: 0.7rem; opacity: 0;"></i></div>
                                 <div class="checklist-content">
-                                    <h4>Review People Committee recruitment proposal</h4>
+                                    <h4>Review People Committee proposal</h4>
                                     <p class="checklist-due">Due for Board approval</p>
                                 </div>
                             </div>
@@ -648,23 +873,23 @@
                         <div class="card-header">
                             <h3><i class="fas fa-bell"></i> Notifications</h3>
                         </div>
-                        <div class="card-body">
-                            <div class="checklist-item" style="border-left: 3px solid var(--danger); margin-bottom: 0.5rem; border-radius: 4px;">
+                        <div class="card-body" style="padding: 0;">
+                            <div class="checklist-item" style="border-left: 3px solid var(--danger); background: #fef2f2;">
                                 <div class="checklist-content">
-                                    <h4 style="color: var(--danger);">Board Meeting Tomorrow</h4>
-                                    <p>Property Committee items on agenda</p>
+                                    <h4 style="color: var(--danger); font-size: 0.9rem;">Board Meeting Tomorrow</h4>
+                                    <p style="font-size: 0.8rem;">Property Committee items on agenda</p>
                                 </div>
                             </div>
-                            <div class="checklist-item" style="border-left: 3px solid var(--warning); margin-bottom: 0.5rem; border-radius: 4px;">
+                            <div class="checklist-item" style="border-left: 3px solid var(--warning); background: #fffbeb;">
                                 <div class="checklist-content">
-                                    <h4 style="color: var(--warning);">Committee Document Pending</h4>
-                                    <p>FIG recommendations awaiting your review</p>
+                                    <h4 style="color: var(--warning); font-size: 0.9rem;">Document Pending</h4>
+                                    <p style="font-size: 0.8rem;">FIG recommendations awaiting review</p>
                                 </div>
                             </div>
-                            <div class="checklist-item" style="border-left: 3px solid var(--primary); border-radius: 4px;">
+                            <div class="checklist-item" style="border-left: 3px solid var(--primary); background: #eff6ff;">
                                 <div class="checklist-content">
-                                    <h4 style="color: var(--primary);">New Committee Message</h4>
-                                    <p>People Committee discussed new policy</p>
+                                    <h4 style="color: var(--primary); font-size: 0.9rem;">New Committee Message</h4>
+                                    <p style="font-size: 0.8rem;">People Committee discussed policy</p>
                                 </div>
                             </div>
                         </div>
@@ -674,14 +899,14 @@
 
             <!-- Committees Module -->
             <div class="module-section" id="committees">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size: 1.5rem; font-weight: 700;">Committee Management</h2>
+                <div class="flex justify-between items-center mb-4" style="flex-wrap: wrap; gap: 0.5rem;">
+                    <h2 style="font-size: 1.25rem; font-weight: 700;">Committee Management</h2>
                     <div class="chair-only-flex gap-2">
-                        <button class="btn btn-secondary" onclick="openModal('enrollTrustee')">
-                            <i class="fas fa-user-plus"></i> Enroll Trustee
+                        <button class="btn btn-secondary" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;" onclick="openModal('enrollTrustee')">
+                            <i class="fas fa-user-plus"></i> <span class="hidden-mobile">Enroll</span>
                         </button>
-                        <button class="btn btn-primary" onclick="openModal('createCommittee')">
-                            <i class="fas fa-plus"></i> Create Committee
+                        <button class="btn btn-primary" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;" onclick="openModal('createCommittee')">
+                            <i class="fas fa-plus"></i> <span class="hidden-mobile">Create</span>
                         </button>
                     </div>
                 </div>
@@ -708,7 +933,7 @@
                                     <div class="committee-stat-label">Pending</div>
                                 </div>
                             </div>
-                            <div style="margin-bottom: 1rem;">
+                            <div style="margin-bottom: 1rem; font-size: 0.85rem;">
                                 <strong>Chair:</strong> Sarah Johnson<br>
                                 <strong>Secretary:</strong> Michael Chen
                             </div>
@@ -719,10 +944,10 @@
                                 <div class="member-avatar">EW</div>
                             </div>
                             <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                                <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem; font-size: 0.875rem;" onclick="viewCommittee('property')">
+                                <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;" onclick="viewCommittee('property')">
                                     <i class="fas fa-eye"></i> View
                                 </button>
-                                <button class="btn btn-primary chair-only" style="flex: 1; padding: 0.5rem; font-size: 0.875rem;" onclick="manageCommittee('property')">
+                                <button class="btn btn-primary chair-only" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;" onclick="manageCommittee('property')">
                                     <i class="fas fa-cog"></i> Manage
                                 </button>
                             </div>
@@ -750,7 +975,7 @@
                                     <div class="committee-stat-label">Pending</div>
                                 </div>
                             </div>
-                            <div style="margin-bottom: 1rem;">
+                            <div style="margin-bottom: 1rem; font-size: 0.85rem;">
                                 <strong>Chair:</strong> Board Chair<br>
                                 <strong>Secretary:</strong> Emma Williams
                             </div>
@@ -761,10 +986,10 @@
                                 <div class="member-avatar">+2</div>
                             </div>
                             <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                                <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem; font-size: 0.875rem;" onclick="viewCommittee('fig')">
+                                <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;" onclick="viewCommittee('fig')">
                                     <i class="fas fa-eye"></i> View
                                 </button>
-                                <button class="btn btn-primary chair-only" style="flex: 1; padding: 0.5rem; font-size: 0.875rem;" onclick="manageCommittee('fig')">
+                                <button class="btn btn-primary chair-only" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;" onclick="manageCommittee('fig')">
                                     <i class="fas fa-cog"></i> Manage
                                 </button>
                             </div>
@@ -792,7 +1017,7 @@
                                     <div class="committee-stat-label">Pending</div>
                                 </div>
                             </div>
-                            <div style="margin-bottom: 1rem;">
+                            <div style="margin-bottom: 1rem; font-size: 0.85rem;">
                                 <strong>Chair:</strong> David Brown<br>
                                 <strong>Secretary:</strong> Lisa Park
                             </div>
@@ -802,10 +1027,10 @@
                                 <div class="member-avatar">JD</div>
                             </div>
                             <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                                <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem; font-size: 0.875rem;" onclick="viewCommittee('people')">
+                                <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;" onclick="viewCommittee('people')">
                                     <i class="fas fa-eye"></i> View
                                 </button>
-                                <button class="btn btn-primary chair-only" style="flex: 1; padding: 0.5rem; font-size: 0.875rem;" onclick="manageCommittee('people')">
+                                <button class="btn btn-primary chair-only" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;" onclick="manageCommittee('people')">
                                     <i class="fas fa-cog"></i> Manage
                                 </button>
                             </div>
@@ -819,60 +1044,58 @@
                         <h3><i class="fas fa-exchange-alt"></i> Committee to Board Workflow</h3>
                     </div>
                     <div class="card-body">
-                        <div style="background: var(--bg); border-radius: 12px; padding: 1.5rem;">
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-                                <div style="background: white; padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--success);">
-                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                        <div>
-                                            <h4 style="font-weight: 600; margin-bottom: 0.25rem;">Property Maintenance Budget</h4>
-                                            <p style="font-size: 0.875rem; color: var(--text-light);">Property Committee</p>
-                                        </div>
-                                        <span class="workflow-status workflow-approved">
-                                            <i class="fas fa-check-circle"></i> Approved
-                                        </span>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+                            <div style="background: var(--bg); padding: 1.25rem; border-radius: 8px; border-left: 4px solid var(--success);">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                                    <div>
+                                        <h4 style="font-weight: 600; margin-bottom: 0.25rem; font-size: 0.95rem;">Property Maintenance Budget</h4>
+                                        <p style="font-size: 0.8rem; color: var(--text-light);">Property Committee</p>
                                     </div>
-                                    <p style="font-size: 0.875rem; margin-bottom: 1rem;">Q2 2026 maintenance budget approved by committee, awaiting Board ratification.</p>
-                                    <button class="btn btn-primary" style="width: 100%; padding: 0.5rem; font-size: 0.875rem;" onclick="pushToBoard('property-budget')">
-                                        <i class="fas fa-paper-plane"></i> Push to Board
+                                    <span class="workflow-status workflow-approved" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">
+                                        <i class="fas fa-check-circle"></i> Approved
+                                    </span>
+                                </div>
+                                <p style="font-size: 0.8rem; margin-bottom: 1rem; color: var(--text-light);">Q2 2026 maintenance budget approved by committee, awaiting Board ratification.</p>
+                                <button class="btn btn-primary" style="width: 100%; padding: 0.5rem; font-size: 0.8rem;" onclick="pushToBoard('property-budget')">
+                                    <i class="fas fa-paper-plane"></i> Push to Board
+                                </button>
+                            </div>
+
+                            <div style="background: var(--bg); padding: 1.25rem; border-radius: 8px; border-left: 4px solid var(--warning);">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                                    <div>
+                                        <h4 style="font-weight: 600; margin-bottom: 0.25rem; font-size: 0.95rem;">CEO Remuneration Package</h4>
+                                        <p style="font-size: 0.8rem; color: var(--text-light);">People Committee</p>
+                                    </div>
+                                    <span class="workflow-status workflow-pending" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">
+                                        <i class="fas fa-clock"></i> Review
+                                    </span>
+                                </div>
+                                <p style="font-size: 0.8rem; margin-bottom: 1rem; color: var(--text-light);">Proposed salary review and benefits package for CEO position.</p>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;">
+                                        <i class="fas fa-eye"></i> Review
+                                    </button>
+                                    <button class="btn btn-success" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;">
+                                        <i class="fas fa-check"></i> Approve
                                     </button>
                                 </div>
+                            </div>
 
-                                <div style="background: white; padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--warning);">
-                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                        <div>
-                                            <h4 style="font-weight: 600; margin-bottom: 0.25rem;">New CEO Remuneration Package</h4>
-                                            <p style="font-size: 0.875rem; color: var(--text-light);">People Committee</p>
-                                        </div>
-                                        <span class="workflow-status workflow-pending">
-                                            <i class="fas fa-clock"></i> Review
-                                        </span>
+                            <div style="background: var(--bg); padding: 1.25rem; border-radius: 8px; border-left: 4px solid var(--primary);">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                                    <div>
+                                        <h4 style="font-weight: 600; margin-bottom: 0.25rem; font-size: 0.95rem;">Risk Register Update</h4>
+                                        <p style="font-size: 0.8rem; color: var(--text-light);">FIG Committee</p>
                                     </div>
-                                    <p style="font-size: 0.875rem; margin-bottom: 1rem;">Proposed salary review and benefits package for CEO position.</p>
-                                    <div style="display: flex; gap: 0.5rem;">
-                                        <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem; font-size: 0.875rem;">
-                                            <i class="fas fa-eye"></i> Review
-                                        </button>
-                                        <button class="btn btn-success" style="flex: 1; padding: 0.5rem; font-size: 0.875rem;">
-                                            <i class="fas fa-check"></i> Approve
-                                        </button>
-                                    </div>
+                                    <span class="workflow-status workflow-board" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">
+                                        <i class="fas fa-gavel"></i> On Agenda
+                                    </span>
                                 </div>
-
-                                <div style="background: white; padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--primary);">
-                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                        <div>
-                                            <h4 style="font-weight: 600; margin-bottom: 0.25rem;">Risk Register Update</h4>
-                                            <p style="font-size: 0.875rem; color: var(--text-light);">FIG Committee</p>
-                                        </div>
-                                        <span class="workflow-status workflow-board">
-                                            <i class="fas fa-gavel"></i> On Agenda
-                                        </span>
-                                    </div>
-                                    <p style="font-size: 0.875rem; margin-bottom: 1rem;">Updated risk assessment approved and scheduled for next Board meeting (25 Feb).</p>
-                                    <button class="btn btn-secondary" style="width: 100%; padding: 0.5rem; font-size: 0.875rem;">
-                                        <i class="fas fa-file-alt"></i> View Pack
-                                    </button>
-                                </div>
+                                <p style="font-size: 0.8rem; margin-bottom: 1rem; color: var(--text-light);">Updated risk assessment approved and scheduled for next Board meeting (25 Feb).</p>
+                                <button class="btn btn-secondary" style="width: 100%; padding: 0.5rem; font-size: 0.8rem;">
+                                    <i class="fas fa-file-alt"></i> View Pack
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -881,19 +1104,19 @@
 
             <!-- Meetings Module -->
             <div class="module-section" id="meetings">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 style="font-size: 1.5rem; font-weight: 700;">Meeting Management</h2>
+                <div class="flex justify-between items-center mb-4" style="flex-wrap: wrap; gap: 0.5rem;">
+                    <h2 style="font-size: 1.25rem; font-weight: 700;">Meeting Management</h2>
                     <div class="chair-only-flex gap-2">
-                        <button class="btn btn-primary" onclick="openModal('scheduleMeeting')">
-                            <i class="fas fa-plus"></i> Schedule Meeting
+                        <button class="btn btn-primary" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;" onclick="openModal('scheduleMeeting')">
+                            <i class="fas fa-plus"></i> Schedule
                         </button>
                     </div>
                 </div>
 
                 <div class="meeting-tabs">
-                    <button class="meeting-tab active" onclick="filterMeetings('all', this)">All Meetings</button>
-                    <button class="meeting-tab" onclick="filterMeetings('board', this)">Board Meetings</button>
-                    <button class="meeting-tab" onclick="filterMeetings('committee', this)">Committee Meetings</button>
+                    <button class="meeting-tab active" onclick="filterMeetings('all', this)">All</button>
+                    <button class="meeting-tab" onclick="filterMeetings('board', this)">Board</button>
+                    <button class="meeting-tab" onclick="filterMeetings('committee', this)">Committee</button>
                     <button class="meeting-tab" onclick="filterMeetings('extraordinary', this)">Extraordinary</button>
                 </div>
 
@@ -901,136 +1124,106 @@
                     <div class="card-header">
                         <h3>Upcoming Meetings</h3>
                         <div class="flex gap-2">
-                            <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                                <i class="fas fa-filter"></i> Filter
+                            <button class="btn btn-secondary" style="padding: 0.5rem; font-size: 0.75rem;">
+                                <i class="fas fa-filter"></i>
                             </button>
-                            <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                                <i class="fas fa-download"></i> Export
+                            <button class="btn btn-secondary" style="padding: 0.5rem; font-size: 0.75rem;">
+                                <i class="fas fa-download"></i>
                             </button>
                         </div>
                     </div>
                     <div class="card-body" style="padding: 0;">
                         <!-- Board Meeting -->
-                        <div class="checklist-item meeting-item" data-type="board" style="padding: 1.5rem; border-left: 4px solid var(--primary);">
-                            <div class="checklist-content" style="flex: 1;">
-                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                        <div class="checklist-item meeting-item" data-type="board" style="padding: 1.25rem; border-left: 4px solid var(--primary); flex-wrap: wrap;">
+                            <div class="checklist-content" style="flex: 1; min-width: 250px;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
                                     <div>
                                         <span class="meeting-type-badge type-board">
-                                            <i class="fas fa-building"></i> Board Meeting
+                                            <i class="fas fa-building"></i> Board
                                         </span>
-                                        <h4 style="font-size: 1.125rem; font-weight: 600; margin-top: 0.5rem;">Quarterly Board Meeting - Q1 2026</h4>
+                                        <h4 style="font-size: 1rem; font-weight: 600; margin-top: 0.5rem;">Quarterly Board Meeting - Q1 2026</h4>
                                     </div>
-                                    <div style="text-align: right;">
-                                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">25 Feb</div>
-                                        <div style="font-size: 0.875rem; color: var(--text-light);">14:00 - 17:00</div>
+                                    <div style="text-align: left; margin-top: 0.25rem;">
+                                        <div style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">25 Feb</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-light);">14:00 - 17:00</div>
                                     </div>
                                 </div>
-                                <p style="color: var(--text-light); margin-bottom: 0.5rem;">
+                                <p style="color: var(--text-light); margin-bottom: 0.5rem; font-size: 0.8rem;">
                                     <i class="fas fa-map-marker-alt"></i> Main Boardroom & Zoom<br>
-                                    <i class="fas fa-file-alt"></i> 5 Committee items on agenda • 3 Action items
+                                    <i class="fas fa-file-alt"></i> 5 Committee items • 3 Actions
                                 </p>
-                                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                                    <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                                        <i class="fas fa-eye"></i> View Pack
+                                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap;">
+                                    <button class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.75rem;">
+                                        <i class="fas fa-eye"></i> Pack
                                     </button>
-                                    <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                    <button class="btn btn-primary" style="padding: 0.4rem 0.75rem; font-size: 0.75rem;">
                                         <i class="fas fa-check"></i> RSVP
                                     </button>
-                                    <button class="btn btn-purple chair-only" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                                        <i class="fas fa-list"></i> Manage Agenda
+                                    <button class="btn btn-purple chair-only" style="padding: 0.4rem 0.75rem; font-size: 0.75rem;">
+                                        <i class="fas fa-list"></i> Agenda
                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Property Committee Meeting -->
-                        <div class="checklist-item meeting-item" data-type="committee" style="padding: 1.5rem; border-left: 4px solid var(--success);">
-                            <div class="checklist-content" style="flex: 1;">
-                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                        <div class="checklist-item meeting-item" data-type="committee" style="padding: 1.25rem; border-left: 4px solid var(--success); flex-wrap: wrap;">
+                            <div class="checklist-content" style="flex: 1; min-width: 250px;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
                                     <div>
                                         <span class="meeting-type-badge type-committee">
-                                            <i class="fas fa-users"></i> Property Committee
+                                            <i class="fas fa-users"></i> Property
                                         </span>
-                                        <h4 style="font-size: 1.125rem; font-weight: 600; margin-top: 0.5rem;">Monthly Property Review</h4>
+                                        <h4 style="font-size: 1rem; font-weight: 600; margin-top: 0.5rem;">Monthly Property Review</h4>
                                     </div>
-                                    <div style="text-align: right;">
-                                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--success);">20 Feb</div>
-                                        <div style="font-size: 0.875rem; color: var(--text-light);">10:00 - 12:00</div>
+                                    <div style="text-align: left; margin-top: 0.25rem;">
+                                        <div style="font-size: 1.1rem; font-weight: 700; color: var(--success);">20 Feb</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-light);">10:00 - 12:00</div>
                                     </div>
                                 </div>
-                                <p style="color: var(--text-light); margin-bottom: 0.5rem;">
+                                <p style="color: var(--text-light); margin-bottom: 0.5rem; font-size: 0.8rem;">
                                     <i class="fas fa-map-marker-alt"></i> Conference Room B<br>
-                                    <i class="fas fa-exclamation-circle"></i> 2 Items pending Board approval workflow
+                                    <i class="fas fa-exclamation-circle"></i> 2 Items pending workflow
                                 </p>
-                                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                                    <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                                        <i class="fas fa-eye"></i> View Agenda
+                                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap;">
+                                    <button class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.75rem;">
+                                        <i class="fas fa-eye"></i> Agenda
                                     </button>
-                                    <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                    <button class="btn btn-primary" style="padding: 0.4rem 0.75rem; font-size: 0.75rem;">
                                         <i class="fas fa-check"></i> RSVP
                                     </button>
-                                    <button class="btn btn-success chair-only" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="openModal('pushToBoard')">
-                                        <i class="fas fa-paper-plane"></i> Push to Board
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- FIG Committee Meeting -->
-                        <div class="checklist-item meeting-item" data-type="committee" style="padding: 1.5rem; border-left: 4px solid var(--purple);">
-                            <div class="checklist-content" style="flex: 1;">
-                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                                    <div>
-                                        <span class="meeting-type-badge" style="background: #ede9fe; color: var(--purple);">
-                                            <i class="fas fa-chart-line"></i> FIG Committee
-                                        </span>
-                                        <h4 style="font-size: 1.125rem; font-weight: 600; margin-top: 0.5rem;">Finance & Governance Review</h4>
-                                    </div>
-                                    <div style="text-align: right;">
-                                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--purple);">22 Feb</div>
-                                        <div style="font-size: 0.875rem; color: var(--text-light);">14:00 - 16:00</div>
-                                    </div>
-                                </div>
-                                <p style="color: var(--text-light); margin-bottom: 0.5rem;">
-                                    <i class="fas fa-video"></i> Microsoft Teams<br>
-                                    <i class="fas fa-file-invoice"></i> Q4 Financial Reports Review
-                                </p>
-                                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                                    <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                                        <i class="fas fa-eye"></i> View Agenda
-                                    </button>
-                                    <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                                        <i class="fas fa-check"></i> RSVP
+                                    <button class="btn btn-success chair-only" style="padding: 0.4rem 0.75rem; font-size: 0.75rem;" onclick="openModal('pushToBoard')">
+                                        <i class="fas fa-paper-plane"></i> Push
                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Extraordinary Board Meeting -->
-                        <div class="checklist-item meeting-item" data-type="extraordinary" style="padding: 1.5rem; border-left: 4px solid var(--danger);">
-                            <div class="checklist-content" style="flex: 1;">
-                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                        <div class="checklist-item meeting-item" data-type="extraordinary" style="padding: 1.25rem; border-left: 4px solid var(--danger); flex-wrap: wrap;">
+                            <div class="checklist-content" style="flex: 1; min-width: 250px;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
                                     <div>
                                         <span class="meeting-type-badge type-extraordinary">
-                                            <i class="fas fa-exclamation"></i> Extraordinary
+                                            <i class="fas fa-exclamation"></i> Emergency
                                         </span>
-                                        <h4 style="font-size: 1.125rem; font-weight: 600; margin-top: 0.5rem;">Emergency Session - Property Acquisition</h4>
+                                        <h4 style="font-size: 1rem; font-weight: 600; margin-top: 0.5rem;">Property Acquisition</h4>
                                     </div>
-                                    <div style="text-align: right;">
-                                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--danger);">28 Feb</div>
-                                        <div style="font-size: 0.875rem; color: var(--text-light);">09:00 - 11:00</div>
+                                    <div style="text-align: left; margin-top: 0.25rem;">
+                                        <div style="font-size: 1.1rem; font-weight: 700; color: var(--danger);">28 Feb</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-light);">09:00 - 11:00</div>
                                     </div>
                                 </div>
-                                <p style="color: var(--text-light); margin-bottom: 0.5rem;">
+                                <p style="color: var(--text-light); margin-bottom: 0.5rem; font-size: 0.8rem;">
                                     <i class="fas fa-map-marker-alt"></i> Urgent - Boardroom<br>
-                                    <i class="fas fa-info-circle"></i> Time-sensitive property opportunity requires immediate decision
+                                    <i class="fas fa-info-circle"></i> Time-sensitive opportunity
                                 </p>
-                                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                                    <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                                        <i class="fas fa-eye"></i> View Papers
+                                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap;">
+                                    <button class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.75rem;">
+                                        <i class="fas fa-eye"></i> Papers
                                     </button>
-                                    <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                                        <i class="fas fa-check"></i> Confirm Attendance
+                                    <button class="btn btn-primary" style="padding: 0.4rem 0.75rem; font-size: 0.75rem;">
+                                        <i class="fas fa-check"></i> Confirm
                                     </button>
                                 </div>
                             </div>
@@ -1044,8 +1237,8 @@
                 <div class="card">
                     <div class="card-header">
                         <h3>Open Trustee Positions</h3>
-                        <button class="btn btn-primary admin-only" onclick="openModal('newRole')">
-                            <i class="fas fa-plus"></i> Post New Role
+                        <button class="btn btn-primary admin-only" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;" onclick="openModal('newRole')">
+                            <i class="fas fa-plus"></i> Post
                         </button>
                     </div>
                     <div class="card-body">
@@ -1054,16 +1247,15 @@
                                 <div>
                                     <div class="job-title">Trustee - Finance & Audit Committee</div>
                                     <div class="job-meta">
-                                        <span><i class="fas fa-map-marker-alt"></i> London (Hybrid)</span>
+                                        <span><i class="fas fa-map-marker-alt"></i> London</span>
                                         <span><i class="fas fa-clock"></i> 2 days/week</span>
-                                        <span><i class="fas fa-pound-sign"></i> Unpaid</span>
                                     </div>
                                 </div>
                                 <span class="status-badge status-open">Open</span>
                             </div>
-                            <p>Seeking a qualified accountant (ACA/ACCA) with nonprofit experience to chair our Finance & Audit Committee.</p>
-                            <div style="margin-top: 1rem;">
-                                <strong>Applications:</strong> 12 received | <strong>Shortlisted:</strong> 4 | <strong>Interviews:</strong> 2 scheduled
+                            <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 0.75rem;">Seeking a qualified accountant (ACA/ACCA) with nonprofit experience.</p>
+                            <div style="font-size: 0.8rem;">
+                                <strong>Applications:</strong> 12 | <strong>Shortlisted:</strong> 4 | <strong>Interviews:</strong> 2
                                 <div class="progress-bar"><div class="progress-fill" style="width: 65%;"></div></div>
                             </div>
                         </div>
@@ -1075,14 +1267,13 @@
                                     <div class="job-meta">
                                         <span><i class="fas fa-map-marker-alt"></i> Remote</span>
                                         <span><i class="fas fa-clock"></i> 1 day/week</span>
-                                        <span><i class="fas fa-pound-sign"></i> Unpaid</span>
                                     </div>
                                 </div>
-                                <span class="status-badge status-review">Under Review</span>
+                                <span class="status-badge status-review">Review</span>
                             </div>
-                            <p>Experienced safeguarding professional needed to oversee our child protection and vulnerable adult policies.</p>
-                            <div style="margin-top: 1rem;">
-                                <strong>Applications:</strong> 8 received | <strong>Shortlisted:</strong> 3 | <strong>Interviews:</strong> Pending
+                            <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 0.75rem;">Experienced safeguarding professional needed.</p>
+                            <div style="font-size: 0.8rem;">
+                                <strong>Applications:</strong> 8 | <strong>Shortlisted:</strong> 3 | <strong>Interviews:</strong> Pending
                                 <div class="progress-bar"><div class="progress-fill" style="width: 40%;"></div></div>
                             </div>
                         </div>
@@ -1096,30 +1287,30 @@
                     <div class="card">
                         <div class="card-header">
                             <h3>Your Onboarding Progress</h3>
-                            <span class="status-badge status-active">75% Complete</span>
+                            <span class="status-badge status-active">75%</span>
                         </div>
                         <div class="card-body" style="padding: 0;">
                             <div class="checklist-item completed">
-                                <div class="checklist-checkbox"><i class="fas fa-check"></i></div>
+                                <div class="checklist-checkbox"><i class="fas fa-check" style="font-size: 0.7rem;"></i></div>
                                 <div class="checklist-content">
                                     <h4>Submit Application Form</h4>
                                     <p>Completed on 15 Jan 2026</p>
                                 </div>
                             </div>
                             <div class="checklist-item completed">
-                                <div class="checklist-checkbox"><i class="fas fa-check"></i></div>
+                                <div class="checklist-checkbox"><i class="fas fa-check" style="font-size: 0.7rem;"></i></div>
                                 <div class="checklist-content">
                                     <h4>ID Verification & DBS Check</h4>
                                     <p>Documents verified • DBS cleared</p>
                                 </div>
                             </div>
                             <div class="checklist-item">
-                                <div class="checklist-checkbox"><i class="fas fa-check"></i></div>
+                                <div class="checklist-checkbox"><i class="fas fa-check" style="font-size: 0.7rem; opacity: 0;"></i></div>
                                 <div class="checklist-content">
                                     <h4>Complete Mandatory Training</h4>
                                     <p class="checklist-due">Due in 5 days</p>
                                 </div>
-                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Start</button>
+                                <button class="btn btn-primary" style="padding: 0.4rem 0.75rem; font-size: 0.75rem;">Start</button>
                             </div>
                         </div>
                     </div>
@@ -1129,10 +1320,10 @@
                             <h3>Document Uploads</h3>
                         </div>
                         <div class="card-body">
-                            <div style="border: 2px dashed var(--border); border-radius: 12px; padding: 2rem; text-align: center; margin-bottom: 1rem; cursor: pointer;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+                            <div style="border: 2px dashed var(--border); border-radius: 12px; padding: 2rem; text-align: center; cursor: pointer;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
                                 <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
-                                <p style="font-weight: 600;">Drop files here or click to upload</p>
-                                <p style="font-size: 0.875rem; color: var(--text-light);">PDF, JPG, PNG up to 10MB</p>
+                                <p style="font-weight: 600; font-size: 0.9rem;">Drop files here or click to upload</p>
+                                <p style="font-size: 0.75rem; color: var(--text-light);">PDF, JPG, PNG up to 10MB</p>
                             </div>
                         </div>
                     </div>
@@ -1144,7 +1335,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3>Mandatory Training</h3>
-                        <span class="status-badge status-review">2 Due This Month</span>
+                        <span class="status-badge status-review">2 Due</span>
                     </div>
                     <div class="card-body">
                         <div class="training-grid">
@@ -1152,13 +1343,13 @@
                                 <div class="training-thumbnail"><i class="fas fa-shield-alt"></i></div>
                                 <div class="training-info">
                                     <h3>Safeguarding Essentials</h3>
-                                    <p style="font-size: 0.875rem; color: var(--text-light); margin-bottom: 1rem;">Essential training for all trustees working with vulnerable groups.</p>
+                                    <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 1rem;">Essential training for all trustees.</p>
                                     <div class="training-meta">
                                         <span class="training-duration"><i class="fas fa-clock"></i> 2 hours</span>
                                         <span class="status-badge status-open">Required</span>
                                     </div>
-                                    <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="startTraining('safeguarding')">
-                                        <i class="fas fa-play"></i> Start Module
+                                    <button class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.5rem;" onclick="startTraining('safeguarding')">
+                                        <i class="fas fa-play"></i> Start
                                     </button>
                                 </div>
                             </div>
@@ -1169,13 +1360,13 @@
                                 </div>
                                 <div class="training-info">
                                     <h3>Charity Governance</h3>
-                                    <p style="font-size: 0.875rem; color: var(--text-light); margin-bottom: 1rem;">Understanding your legal duties as a trustee.</p>
+                                    <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 1rem;">Understanding your legal duties.</p>
                                     <div class="training-meta">
                                         <span class="training-duration"><i class="fas fa-clock"></i> 3 hours</span>
                                         <span class="status-badge status-open">Required</span>
                                     </div>
-                                    <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="startTraining('governance')">
-                                        <i class="fas fa-play"></i> Start Module
+                                    <button class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.5rem;" onclick="startTraining('governance')">
+                                        <i class="fas fa-play"></i> Start
                                     </button>
                                 </div>
                             </div>
@@ -1246,19 +1437,19 @@
                             <div class="checklist-item" style="border-left: 3px solid var(--primary);">
                                 <div class="checklist-content">
                                     <h4>Board Meeting</h4>
-                                    <p><i class="fas fa-clock"></i> Today, 14:00 - 17:00<br>
-                                    <i class="fas fa-map-marker-alt"></i> Boardroom & Zoom</p>
+                                    <p style="font-size: 0.8rem;"><i class="fas fa-clock"></i> Today, 14:00<br>
+                                    <i class="fas fa-map-marker-alt"></i> Boardroom</p>
                                 </div>
-                                <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="toggleRSVP(this)">
+                                <button class="btn btn-secondary" style="padding: 0.4rem;" onclick="toggleRSVP(this)">
                                     <i class="fas fa-check"></i>
                                 </button>
                             </div>
                             <div class="checklist-item" style="border-left: 3px solid var(--success);">
                                 <div class="checklist-content">
                                     <h4>Property Committee</h4>
-                                    <p><i class="fas fa-clock"></i> 20 Feb, 10:00 - 12:00</p>
+                                    <p style="font-size: 0.8rem;"><i class="fas fa-clock"></i> 20 Feb, 10:00</p>
                                 </div>
-                                <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="toggleRSVP(this)">
+                                <button class="btn btn-secondary" style="padding: 0.4rem;" onclick="toggleRSVP(this)">
                                     <i class="fas fa-question"></i>
                                 </button>
                             </div>
@@ -1270,24 +1461,36 @@
             <!-- Messaging Module -->
             <div class="module-section" id="messaging">
                 <div class="messaging-layout">
-                    <div class="conversations-list">
-                        <div class="conversation-item active">
+                    <div class="conversations-list" id="conversationsList">
+                        <div class="conversation-item active" onclick="openChat(this)">
                             <div class="conversation-header">
                                 <span class="conversation-name">Board Chair</span>
                                 <span class="conversation-time">10:30</span>
                             </div>
                             <div class="conversation-preview">Can we discuss the Q4 budget...</div>
                         </div>
-                        <div class="conversation-item">
+                        <div class="conversation-item" onclick="openChat(this)">
                             <div class="conversation-header">
                                 <span class="conversation-name">Property Committee</span>
                                 <span class="conversation-time">Yesterday</span>
                             </div>
                             <div class="conversation-preview">Minutes from last property meeting...</div>
                         </div>
+                        <div class="conversation-item" onclick="openChat(this)">
+                            <div class="conversation-header">
+                                <span class="conversation-name">Sarah Johnson</span>
+                                <span class="conversation-time">Mon</span>
+                            </div>
+                            <div class="conversation-preview">Thanks for the update on the...</div>
+                        </div>
                     </div>
                     <div class="chat-area">
-                        <div class="chat-header">Board Chair</div>
+                        <div class="chat-header">
+                            <button class="back-btn" onclick="backToConversations()">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <span id="chatTitle">Board Chair</span>
+                        </div>
                         <div class="chat-messages" id="chatMessages">
                             <div class="message received">
                                 <div>Hi John, can we discuss the Q4 budget projections?</div>
@@ -1300,7 +1503,7 @@
                         </div>
                         <div class="chat-input">
                             <input type="text" placeholder="Type your message..." id="messageInput">
-                            <button class="btn btn-primary" onclick="sendMessage()">
+                            <button class="btn btn-primary" style="padding: 0.5rem 1rem;" onclick="sendMessage()">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
@@ -1314,8 +1517,8 @@
                     <div class="card-header">
                         <h3>My Tasks & Milestones</h3>
                         <div class="admin-only">
-                            <button class="btn btn-primary" onclick="openModal('newTask')">
-                                <i class="fas fa-plus"></i> Assign Task
+                            <button class="btn btn-primary" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;" onclick="openModal('newTask')">
+                                <i class="fas fa-plus"></i> Assign
                             </button>
                         </div>
                     </div>
@@ -1350,7 +1553,7 @@
                     <div class="card-header">
                         <h3>Meeting Minutes & Records</h3>
                         <div class="admin-only-flex gap-2">
-                            <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                            <button class="btn btn-secondary" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;">
                                 <i class="fas fa-upload"></i> Upload
                             </button>
                         </div>
@@ -1367,6 +1570,11 @@
                                 <div class="doc-title">Board Pack - Feb 2026</div>
                                 <div class="doc-meta">Draft • Updated yesterday<br>Pending Review</div>
                             </div>
+                            <div class="document-card">
+                                <div class="doc-icon sheet"><i class="fas fa-file-excel"></i></div>
+                                <div class="doc-title">Financial Reports Q4</div>
+                                <div class="doc-meta">Final • 10 Jan 2026<br>FIG Committee</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1378,8 +1586,8 @@
                     <div class="card-header">
                         <h3>Policies & Governance Documents</h3>
                         <div class="admin-only-flex gap-2">
-                            <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                                <i class="fas fa-plus"></i> Add Policy
+                            <button class="btn btn-primary" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;">
+                                <i class="fas fa-plus"></i> Add
                             </button>
                         </div>
                     </div>
@@ -1398,7 +1606,7 @@
                                 <tr>
                                     <td>
                                         <strong>Safeguarding Policy</strong><br>
-                                        <span style="font-size: 0.875rem; color: var(--text-light);">Child & Vulnerable Adult Protection</span>
+                                        <span style="font-size: 0.75rem; color: var(--text-light);">Child & Vulnerable Adult Protection</span>
                                     </td>
                                     <td>Sarah Johnson</td>
                                     <td>15 Jan 2025</td>
@@ -1408,11 +1616,21 @@
                                 <tr>
                                     <td>
                                         <strong>Data Protection (GDPR)</strong><br>
-                                        <span style="font-size: 0.875rem; color: var(--text-light);">Privacy & Data Handling</span>
+                                        <span style="font-size: 0.75rem; color: var(--text-light);">Privacy & Data Handling</span>
                                     </td>
                                     <td>Emma Williams</td>
                                     <td>20 May 2025</td>
                                     <td>20 May 2026</td>
+                                    <td><span class="policy-status status-active">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Health & Safety</strong><br>
+                                        <span style="font-size: 0.75rem; color: var(--text-light);">Workplace Safety Standards</span>
+                                    </td>
+                                    <td>Michael Chen</td>
+                                    <td>10 Aug 2025</td>
+                                    <td>10 Aug 2026</td>
                                     <td><span class="policy-status status-active">Active</span></td>
                                 </tr>
                             </tbody>
@@ -1524,8 +1742,29 @@
             location.reload();
         }
 
+        // Sidebar Toggle for Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // Search Mobile Toggle
+        function toggleSearchMobile() {
+            const searchBox = document.getElementById('searchBox');
+            if (window.innerWidth <= 768) {
+                searchBox.classList.toggle('mobile-visible');
+            }
+        }
+
         // Navigation
         function showModule(moduleName) {
+            // Close sidebar on mobile when navigating
+            if (window.innerWidth <= 1024) {
+                toggleSidebar();
+            }
+
             document.querySelectorAll('.module-section').forEach(section => {
                 section.classList.remove('active');
             });
@@ -1553,6 +1792,16 @@
             };
             
             document.getElementById('pageTitle').textContent = titles[moduleName];
+            
+            // Update subtitle based on module
+            const subtitles = {
+                'dashboard': 'Welcome back, here is what is happening',
+                'committees': 'Manage committees and workflows',
+                'meetings': 'Schedule and manage meetings',
+                'recruitment': 'Active recruitment campaigns',
+                'messaging': 'Your secure communications'
+            };
+            document.getElementById('pageSubtitle').textContent = subtitles[moduleName] || 'Manage your governance activities';
         }
 
         // Meeting Filters
@@ -1583,7 +1832,28 @@
             showToast('Item pushed to Board meeting agenda successfully', 'success');
         }
 
-        // Messaging
+        // Messaging Mobile Navigation
+        function openChat(element) {
+            const list = document.getElementById('conversationsList');
+            const title = document.getElementById('chatTitle');
+            const name = element.querySelector('.conversation-name').textContent;
+            
+            // Update active state
+            document.querySelectorAll('.conversation-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            
+            title.textContent = name;
+            
+            // On mobile, hide list
+            if (window.innerWidth <= 768) {
+                list.classList.add('hidden');
+            }
+        }
+
+        function backToConversations() {
+            document.getElementById('conversationsList').classList.remove('hidden');
+        }
+
         function sendMessage() {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
@@ -1597,6 +1867,7 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 input.value = '';
                 
+                // Simulate reply
                 setTimeout(() => {
                     const reply = document.createElement('div');
                     reply.className = 'message received';
@@ -1703,6 +1974,18 @@
         // Close modal on outside click
         document.getElementById('modalOverlay').addEventListener('click', function(e) {
             if (e.target === this) closeModal();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 1024) {
+                document.getElementById('sidebar').classList.remove('active');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
+            if (window.innerWidth > 768) {
+                document.getElementById('conversationsList').classList.remove('hidden');
+                document.getElementById('searchBox').classList.remove('mobile-visible');
+            }
         });
     </script>
 </body>
