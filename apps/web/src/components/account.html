@@ -1,0 +1,199 @@
+<!-- Account Module - Modern Design -->
+<div class="module-section" id="account" data-module-init="initAccountModule">
+    
+    <!-- Account Header -->
+    <div class="account-header">
+        <h1><i class="fas fa-cog"></i> Account Settings</h1>
+        <p>Manage your login credentials and security settings</p>
+    </div>
+
+    <div style="max-width: 900px; margin: -2rem auto 0; padding: 0 1rem 2rem; position: relative; z-index: 2;">
+        
+        <!-- Login Details -->
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <i class="fas fa-sign-in-alt"></i>
+                <h3>Login Details</h3>
+            </div>
+            <div class="settings-card-body">
+                <!-- Email Address -->
+                <div class="settings-item">
+                    <div class="settings-item-info">
+                        <h4>Email Address</h4>
+                        <p id="accountEmail">admin@kort.org.uk</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="openChangeEmailModal()">
+                        <i class="fas fa-edit"></i> Change
+                    </button>
+                </div>
+
+                <!-- Password -->
+                <div class="settings-item">
+                    <div class="settings-item-info">
+                        <h4>Password</h4>
+                        <p>•••••••••••••</p>
+                        <p class="hint">Last changed: <span id="passwordLastChanged">Never</span></p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="openChangePasswordModal()">
+                        <i class="fas fa-key"></i> Change
+                    </button>
+                </div>
+
+                <!-- Two-Factor Authentication -->
+                <div class="settings-item">
+                    <div class="settings-item-info">
+                        <h4><i class="fas fa-shield-alt" style="color: var(--primary); margin-right: 0.5rem;"></i> Multi-Factor Authentication</h4>
+                        <p>Add an extra layer of security to your account</p>
+                        <span class="badge badge-warning" id="mfaStatus">Not Enabled</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="openMFASetupModal()">
+                        <i class="fas fa-plus"></i> Enable
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Session Management -->
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <i class="fas fa-desktop"></i>
+                <h3>Active Sessions</h3>
+            </div>
+            <div class="settings-card-body" style="padding: 1rem 0;">
+                <div class="session-item">
+                    <div class="session-info">
+                        <div class="session-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="session-details">
+                            <h4>Current Session</h4>
+                            <p>Chrome on Windows • IP: 192.168.1.1</p>
+                            <span class="session-status">
+                                <i class="fas fa-circle"></i> Active now
+                            </span>
+                        </div>
+                    </div>
+                    <span class="badge badge-success">This Device</span>
+                </div>
+                
+                <div style="padding: 0 1.5rem 1.5rem;">
+                    <button class="btn btn-danger" onclick="logoutAllDevices()">
+                        <i class="fas fa-sign-out-alt"></i> Log out of all devices
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="danger-zone">
+            <div class="danger-zone-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Danger Zone</h3>
+            </div>
+            <div class="danger-zone-body">
+                <div class="danger-zone-info">
+                    <h4>Delete Account</h4>
+                    <p>Permanently delete your account and all associated data</p>
+                </div>
+                <button class="btn btn-danger" onclick="openDeleteAccountModal()">
+                    <i class="fas fa-trash"></i> Delete Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Email Modal -->
+<div class="modal-overlay" id="changeEmailModal" style="display: none;">
+    <div class="modal" style="max-width: 450px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-envelope"></i> Change Email Address</h3>
+            <button class="modal-close" onclick="closeChangeEmailModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Current Email</label>
+                <input type="email" id="currentEmailDisplay" disabled style="background: #f8fafc;">
+            </div>
+            <div class="form-group">
+                <label>New Email Address *</label>
+                <input type="email" id="newEmail" placeholder="Enter new email address">
+            </div>
+            <div class="form-group">
+                <label>Current Password *</label>
+                <input type="password" id="emailChangePassword" placeholder="Enter your password to confirm">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeChangeEmailModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitEmailChange()">
+                <i class="fas fa-save"></i> Update Email
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="changePasswordModal" style="display: none;">
+    <div class="modal" style="max-width: 450px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-key"></i> Change Password</h3>
+            <button class="modal-close" onclick="closeChangePasswordModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Current Password *</label>
+                <input type="password" id="currentPassword" placeholder="Enter current password">
+            </div>
+            <div class="form-group">
+                <label>New Password *</label>
+                <input type="password" id="newPassword" placeholder="Enter new password (min 8 characters)">
+                <span class="help-text">Must be at least 8 characters</span>
+            </div>
+            <div class="form-group">
+                <label>Confirm New Password *</label>
+                <input type="password" id="confirmNewPassword" placeholder="Confirm new password">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeChangePasswordModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitPasswordChange()">
+                <i class="fas fa-save"></i> Update Password
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MFA Setup Modal -->
+<div class="modal-overlay" id="mfaSetupModal" style="display: none;">
+    <div class="modal" style="max-width: 450px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-shield-alt"></i> Enable Multi-Factor Authentication</h3>
+            <button class="modal-close" onclick="closeMFASetupModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div style="text-align: center; padding: 1rem;">
+                <div style="width: 180px; height: 180px; background: var(--bg); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 2px dashed var(--border);">
+                    <i class="fas fa-qrcode" style="font-size: 5rem; color: var(--text-light);"></i>
+                </div>
+                <p style="color: var(--text-light); font-size: 0.9rem;">Scan this QR code with your authenticator app<br>(Google Authenticator, Authy, etc.)</p>
+            </div>
+            <div class="form-group">
+                <label>Enter 6-digit code from your app *</label>
+                <input type="text" id="mfaCode" placeholder="000000" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-family: monospace;">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeMFASetupModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitMFASetup()">
+                <i class="fas fa-check"></i> Verify & Enable
+            </button>
+        </div>
+    </div>
+</div>

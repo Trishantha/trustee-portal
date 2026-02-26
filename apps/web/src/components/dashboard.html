@@ -1,0 +1,220 @@
+<!-- Dashboard Module -->
+<div class="module-section active" id="dashboard">
+    
+    <!-- Getting Started Card (shown if setup incomplete) -->
+    <div class="card" id="gettingStartedCard" style="display: none; margin-bottom: 1.5rem; border: 2px solid var(--primary);">
+        <div class="card-header" style="background: var(--primary-light);">
+            <h3 style="color: var(--primary);"><i class="fas fa-rocket"></i> Getting Started</h3>
+        </div>
+        <div class="card-body">
+            <p style="margin-bottom: 1rem;">Complete your organization setup to get the most out of Trustee Portal:</p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                        <span>Create account</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-circle" style="color: var(--border);" id="gs-org-icon"></i>
+                        <span id="gs-org-text">Organization details</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-circle" style="color: var(--border);" id="gs-committee-icon"></i>
+                        <span id="gs-committee-text">Set up committees</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-circle" style="color: var(--border);" id="gs-members-icon"></i>
+                        <span id="gs-members-text">Add members</span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="btn btn-primary btn-lg" onclick="restartSetupWizard()">
+                        <i class="fas fa-magic"></i> Complete Setup
+                    </button>
+                    <button class="btn btn-secondary" onclick="dismissGettingStarted()">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid" id="dashboardStats">
+        <!-- Stats loaded dynamically from API -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value" id="pendingTasksCount">-</div>
+                    <div class="stat-label">Pending Tasks</div>
+                </div>
+                <div class="stat-icon orange"><i class="fas fa-tasks"></i></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value" id="committeesCount">-</div>
+                    <div class="stat-label">My Committees</div>
+                </div>
+                <div class="stat-icon purple"><i class="fas fa-users-cog"></i></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value" id="upcomingMeetingsCount">-</div>
+                    <div class="stat-label">Upcoming Meetings</div>
+                </div>
+                <div class="stat-icon blue"><i class="fas fa-calendar"></i></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value" id="pendingApprovalsCount">-</div>
+                    <div class="stat-label">For Approval</div>
+                </div>
+                <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="loadDashboardData()">Refresh</button>
+            </div>
+            <div class="card-body" id="recentActivityList" style="padding: 0;">
+                <!-- Activity loaded dynamically -->
+                <div style="padding: 2rem; text-align: center; color: var(--text-light);">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p>Loading activity...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-bell"></i> Notifications</h3>
+                <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="loadNotifications()">Refresh</button>
+            </div>
+            <div class="card-body" id="notificationsList" style="padding: 0;">
+                <!-- Notifications loaded dynamically -->
+                <div style="padding: 2rem; text-align: center; color: var(--text-light);">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p>Loading notifications...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Term Expiration Widget (Admin/Chair Only) -->
+        <div class="card admin-chair-only" style="display: none;">
+            <div class="card-header">
+                <h3><i class="fas fa-clock"></i> Term Expirations</h3>
+                <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="loadTermWidget()">Refresh</button>
+            </div>
+            <div class="card-body" id="termExpirationWidget" style="padding: 0;">
+                <div style="padding: 2rem; text-align: center; color: var(--text-light);">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p>Loading term data...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Show admin/chair only elements
+    if (['owner', 'admin', 'chair'].includes(currentRole)) {
+        document.querySelectorAll('.admin-chair-only').forEach(el => {
+            el.style.display = 'block';
+        });
+        loadTermWidget();
+    }
+})();
+
+async function loadTermWidget() {
+    const widget = document.getElementById('termExpirationWidget');
+    if (!widget) return;
+    
+    try {
+        const org = JSON.parse(localStorage.getItem('current_organization') || '{}');
+        if (!org.id) return;
+        
+        const response = await fetch(`${API_BASE_URL}/organizations/${org.id}/term-notifications`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            }
+        });
+        
+        if (!response.ok) {
+            widget.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-light);"><p>Term tracking not available</p></div>';
+            return;
+        }
+        
+        const data = await response.json();
+        
+        if (!data.termTrackingEnabled) {
+            widget.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-light);"><p>Term tracking is disabled</p></div>';
+            return;
+        }
+        
+        if (data.count === 0) {
+            widget.innerHTML = `
+                <div style="padding: 2rem; text-align: center; color: var(--text-light);">
+                    <i class="fas fa-check-circle" style="font-size: 2rem; color: var(--success); margin-bottom: 0.5rem;"></i>
+                    <p>No upcoming term expirations</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Show top 5 urgent notifications
+        const urgent = data.notifications.slice(0, 5);
+        
+        widget.innerHTML = `
+            <div style="max-height: 300px; overflow-y: auto;">
+                ${urgent.map(n => `
+                    <div style="padding: 1rem; border-bottom: 1px solid var(--border); ${n.urgency === 'critical' ? 'background: #fef2f2;' : n.urgency === 'warning' ? 'background: #fffbeb;' : ''}">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${n.first_name} ${n.last_name}</strong>
+                                <span style="font-size: 0.75rem; color: var(--text-light); margin-left: 0.5rem;">${formatRole(n.role)}</span>
+                            </div>
+                            <span style="font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; ${n.days_remaining <= 30 ? 'background: #fee2e2; color: #991b1b;' : n.days_remaining <= 60 ? 'background: #fef3c7; color: #92400e;' : 'background: #dbeafe; color: #1e40af;'}">
+                                ${n.days_remaining} days
+                            </span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.25rem;">
+                            Term ends: ${new Date(n.term_end_date).toLocaleDateString()}
+                        </div>
+                    </div>
+                `).join('')}
+                ${data.count > 5 ? `
+                    <div style="padding: 1rem; text-align: center; border-top: 1px solid var(--border);">
+                        <a href="#" onclick="showModule('trustees', document.querySelector('[data-module=\\'trustees\\']')); return false;" style="color: var(--primary); font-size: 0.85rem;">
+                            View all ${data.count} expirations →
+                        </a>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    } catch (error) {
+        widget.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-light);"><p>Failed to load term data</p></div>';
+    }
+}
+
+function formatRole(role) {
+    const roles = {
+        'owner': 'Owner',
+        'admin': 'Admin',
+        'chair': 'Chair',
+        'secretary': 'Secretary',
+        'trustee': 'Trustee',
+        'viewer': 'Viewer'
+    };
+    return roles[role] || role;
+}
+</script>

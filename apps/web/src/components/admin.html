@@ -1,0 +1,60 @@
+<!-- Admin Module -->
+<div class="module-section" id="admin">
+    <div class="content-grid" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="card">
+            <div class="card-header"><h3>User Management</h3></div>
+            <div class="card-body" id="userManagement">
+                <!-- User stats loaded dynamically -->
+                <div style="padding: 2rem; text-align: center; color: var(--text-light);">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p>Loading user data...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>System Settings</h3></div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Organization Name</label>
+                    <input type="text" placeholder="Loading..." id="orgName">
+                </div>
+                <div class="form-group">
+                    <label>Default Notification Email</label>
+                    <input type="email" placeholder="Loading..." id="orgEmail">
+                </div>
+                <button class="btn btn-success" style="width: 100%; margin-bottom: 0.75rem;" onclick="saveSettings()">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+                <button class="btn btn-primary" style="width: 100%;" onclick="restartSetupWizard()">
+                    <i class="fas fa-magic"></i> Run Setup Wizard
+                </button>
+                <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem; text-align: center;">
+                    Re-run the initial setup to configure committees, members, and more
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>System Status</h3></div>
+            <div class="card-body" id="systemStatus">
+                <!-- Status loaded dynamically -->
+                <div style="padding: 2rem; text-align: center; color: var(--text-light);">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p>Loading status...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>Audit Log</h3></div>
+            <div class="card-body" id="auditLog" style="padding: 0; max-height: 300px; overflow-y: auto;">
+                <!-- Audit log loaded dynamically -->
+                <div style="padding: 2rem; text-align: center; color: var(--text-light);">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p>Loading audit log...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

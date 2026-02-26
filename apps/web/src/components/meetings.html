@@ -1,0 +1,39 @@
+<!-- Meetings Module -->
+<div class="module-section" id="meetings">
+    <div class="flex justify-between items-center mb-4" style="flex-wrap: wrap; gap: 0.5rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 700;">Meeting Management</h2>
+        <div class="chair-only-flex gap-2">
+            <button class="btn btn-primary" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;" onclick="openModal('scheduleMeeting')">
+                <i class="fas fa-plus"></i> Schedule
+            </button>
+        </div>
+    </div>
+
+    <div class="meeting-tabs">
+        <button class="meeting-tab active" onclick="filterMeetings('all', this)">All</button>
+        <button class="meeting-tab" onclick="filterMeetings('board', this)">Board</button>
+        <button class="meeting-tab" onclick="filterMeetings('committee', this)">Committee</button>
+        <button class="meeting-tab" onclick="filterMeetings('extraordinary', this)">Extraordinary</button>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Upcoming Meetings</h3>
+            <div class="flex gap-2">
+                <button class="btn btn-secondary" style="padding: 0.5rem; font-size: 0.75rem;" onclick="showToast('Filter options opened', 'success')">
+                    <i class="fas fa-filter"></i>
+                </button>
+                <button class="btn btn-secondary" style="padding: 0.5rem; font-size: 0.75rem;" onclick="showToast('Downloading calendar...', 'success')">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body" style="padding: 0;" id="meetingsList">
+            <!-- Meetings loaded dynamically -->
+            <div style="padding: 3rem; text-align: center; color: var(--text-light);">
+                <i class="fas fa-calendar" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p>Loading meetings...</p>
+            </div>
+        </div>
+    </div>
+</div>

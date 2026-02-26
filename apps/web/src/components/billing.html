@@ -1,0 +1,750 @@
+<!-- Billing & Subscription Module -->
+<div class="module-section" id="billing">
+    <div class="dashboard-grid" style="margin-bottom: 1.5rem;">
+        <div class="stat-card primary">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value" id="billingPlanName">-</div>
+                    <div class="stat-label">Current Plan</div>
+                </div>
+                <div class="stat-icon"><i class="fas fa-crown"></i></div>
+            </div>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value" id="billingStatus">-</div>
+                    <div class="stat-label">Status</div>
+                </div>
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            </div>
+        </div>
+        <div class="stat-card info">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value" id="billingRenewal">-</div>
+                    <div class="stat-label">Next Billing</div>
+                </div>
+                <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
+            </div>
+        </div>
+        <div class="stat-card warning">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value" id="billingAmount">-</div>
+                    <div class="stat-label">Monthly Cost</div>
+                </div>
+                <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <!-- Current Subscription -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-file-invoice"></i> Subscription Details</h3>
+            </div>
+            <div class="card-body" id="subscriptionDetails">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading subscription...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Stats -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-bar"></i> Usage</h3>
+            </div>
+            <div class="card-body" id="usageStats">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading usage...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Plans -->
+    <div class="card" style="margin-top: 1.5rem;">
+        <div class="card-header">
+            <h3><i class="fas fa-tags"></i> Available Plans</h3>
+        </div>
+        <div class="card-body">
+            <div class="plans-grid" id="availablePlans">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading plans...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Methods -->
+    <div class="card" style="margin-top: 1.5rem;">
+        <div class="card-header">
+            <h3><i class="fas fa-credit-card"></i> Payment Methods</h3>
+            <button class="btn btn-primary btn-sm" onclick="openAddPaymentModal()">
+                <i class="fas fa-plus"></i> Add Card
+            </button>
+        </div>
+        <div class="card-body" id="paymentMethods">
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading payment methods...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Billing History -->
+    <div class="card" style="margin-top: 1.5rem;">
+        <div class="card-header">
+            <h3><i class="fas fa-history"></i> Billing History</h3>
+            <button class="btn btn-secondary btn-sm" onclick="loadBillingHistory()">
+                <i class="fas fa-sync"></i> Refresh
+            </button>
+        </div>
+        <div class="card-body" id="billingHistory" style="padding: 0;">
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading invoices...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage in Stripe Portal -->
+    <div class="card" style="margin-top: 1.5rem;">
+        <div class="card-header">
+            <h3><i class="fab fa-stripe"></i> Stripe Customer Portal</h3>
+        </div>
+        <div class="card-body">
+            <p style="color: var(--text-light); margin-bottom: 1rem;">
+                Access the Stripe Customer Portal to update payment methods, view detailed invoices, and manage your subscription.
+            </p>
+            <button class="btn btn-primary" onclick="openStripePortal()">
+                <i class="fab fa-stripe"></i> Open Customer Portal
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Method Modal -->
+<div class="modal-overlay" id="addPaymentModal" style="display: none;">
+    <div class="modal" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-credit-card"></i> Add Payment Method</h2>
+            <button class="modal-close" onclick="closeAddPaymentModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="paymentElement">
+                <!-- Stripe Payment Element will be mounted here -->
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Initializing secure payment form...</p>
+                </div>
+            </div>
+            <div id="paymentError" class="alert alert-danger" style="display: none; margin-top: 1rem;"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeAddPaymentModal()">Cancel</button>
+            <button class="btn btn-primary" id="submitPaymentBtn" onclick="submitPaymentMethod()">
+                <i class="fas fa-lock"></i> Save Card
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+let stripe = null;
+let elements = null;
+let paymentElement = null;
+let setupIntentClientSecret = null;
+
+// Initialize Stripe with publishable key
+async function initStripe() {
+    try {
+        // Get Stripe config from backend
+        const config = await api.get('/billing/config');
+        if (!config.publishable_key) {
+            console.log('Stripe not configured');
+            return false;
+        }
+        stripe = Stripe(config.publishable_key);
+        return true;
+    } catch (error) {
+        console.error('Failed to initialize Stripe:', error);
+        return false;
+    }
+}
+
+// Load billing data
+async function loadBillingData() {
+    await loadSubscriptionDetails();
+    await loadUsageStats();
+    await loadAvailablePlans();
+    await loadPaymentMethods();
+    await loadBillingHistory();
+}
+
+// Load subscription details
+async function loadSubscriptionDetails() {
+    const container = document.getElementById('subscriptionDetails');
+    try {
+        const data = await api.get('/billing/subscription');
+        
+        document.getElementById('billingPlanName').textContent = data.plan?.name || 'Free';
+        document.getElementById('billingStatus').textContent = (data.subscription_status || 'inactive').toUpperCase();
+        document.getElementById('billingStatus').className = `stat-value status-${data.subscription_status || 'inactive'}`;
+        document.getElementById('billingAmount').textContent = `$${data.plan?.price_monthly || 0}`;
+        document.getElementById('billingRenewal').textContent = data.subscription?.current_period_end ? 
+            new Date(data.subscription.current_period_end).toLocaleDateString() : '-';
+        
+        container.innerHTML = `
+            <div style="display: grid; gap: 1rem;">
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                    <span>Plan</span>
+                    <strong>${data.plan?.name || 'Free'}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                    <span>Status</span>
+                    <span class="badge badge-${data.subscription_status === 'active' ? 'success' : 'warning'}">${data.subscription_status || 'inactive'}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                    <span>Billing Cycle</span>
+                    <strong>Monthly</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                    <span>Current Period</span>
+                    <span>${data.subscription?.current_period_start ? new Date(data.subscription.current_period_start).toLocaleDateString() : '-'} - ${data.subscription?.current_period_end ? new Date(data.subscription.current_period_end).toLocaleDateString() : '-'}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                    <span>Monthly Cost</span>
+                    <strong>$${data.plan?.price_monthly || 0}</strong>
+                </div>
+                ${data.trial_ends_at ? `
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                    <span>Trial Ends</span>
+                    <span class="badge badge-warning">${new Date(data.trial_ends_at).toLocaleDateString()}</span>
+                </div>
+                ` : ''}
+            </div>
+            ${data.subscription?.cancel_at_period_end ? `
+            <div class="alert alert-warning" style="margin-top: 1rem;">
+                <i class="fas fa-exclamation-triangle"></i> 
+                Your subscription will cancel at the end of the current period.
+            </div>
+            ` : ''}
+        `;
+    } catch (error) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Failed to load subscription details</p>
+            </div>
+        `;
+    }
+}
+
+// Load usage stats
+async function loadUsageStats() {
+    const container = document.getElementById('usageStats');
+    try {
+        const data = await api.get('/billing/usage');
+        
+        container.innerHTML = `
+            <div style="display: grid; gap: 1.5rem;">
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Users</span>
+                        <span>${data.usage.users.current} / ${data.usage.users.limit}</span>
+                    </div>
+                    <div class="progress-bar" style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div style="width: ${data.usage.users.percentage}%; background: ${data.usage.users.percentage > 90 ? 'var(--danger)' : 'var(--primary)'}; height: 100%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Storage</span>
+                        <span>${Math.round(data.usage.storage.current / 1024 * 10) / 10}GB / ${Math.round(data.usage.storage.limit / 1024 * 10) / 10}GB</span>
+                    </div>
+                    <div class="progress-bar" style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div style="width: ${data.usage.storage.percentage}%; background: ${data.usage.storage.percentage > 90 ? 'var(--danger)' : 'var(--primary)'}; height: 100%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Committees</span>
+                        <span>${data.usage.committees.current} / ${data.usage.committees.limit}</span>
+                    </div>
+                    <div class="progress-bar" style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div style="width: ${data.usage.committees.percentage}%; background: ${data.usage.committees.percentage > 90 ? 'var(--danger)' : 'var(--primary)'}; height: 100%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Failed to load usage</p>
+            </div>
+        `;
+    }
+}
+
+// Load available plans from Supabase
+async function loadAvailablePlans() {
+    const container = document.getElementById('availablePlans');
+    try {
+        // Fetch plans from the backend API which gets them from Supabase
+        const data = await api.get('/saas/info');
+        const currentOrg = JSON.parse(localStorage.getItem('current_organization') || '{}');
+        
+        if (!data.plans || data.plans.length === 0) {
+            container.innerHTML = '<div class="empty-state"><p>No plans available</p></div>';
+            return;
+        }
+        
+        // Parse features helper
+        const parseFeatures = (features) => {
+            if (!features) return [];
+            if (typeof features === 'string') {
+                try {
+                    return JSON.parse(features);
+                } catch (e) {
+                    return features.split(',').map(f => f.trim());
+                }
+            }
+            if (Array.isArray(features)) return features;
+            return [];
+        };
+        
+        container.innerHTML = data.plans.map((plan, index) => {
+            const isCurrentPlan = plan.id === currentOrg.plan_id;
+            const features = parseFeatures(plan.features);
+            const isPopular = plan.is_popular || index === 2; // Make Standard popular by default
+            const priceMonthly = plan.price?.monthly || plan.price_monthly || 0;
+            const priceYearly = plan.price?.yearly || plan.price_yearly || 0;
+            const maxUsers = plan.limits?.users || plan.max_users || plan.max_trustees || '-'; 
+            const maxCommittees = plan.limits?.committees || plan.max_committees || '-';
+            const storageMB = plan.limits?.storage_mb || plan.max_storage_mb || 5120;
+            const storageDisplay = storageMB >= 1024 ? (storageMB/1024) + 'GB' : storageMB + 'MB';
+            
+            return `
+            <div class="plan-card ${isPopular ? 'popular' : ''}" style="position: relative; ${isPopular ? 'border: 2px solid var(--accent); transform: scale(1.02);' : ''}">
+                ${isPopular ? '<span class="plan-popular-badge"><i class="fas fa-star"></i> POPULAR</span>' : ''}
+                ${isCurrentPlan ? '<span class="badge badge-success" style="position: absolute; top: 10px; right: 10px;">CURRENT</span>' : ''}
+                
+                <h4 style="font-size: 1.25rem; margin-bottom: 0.5rem;">${plan.name}</h4>
+                <div style="font-size: 0.85rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">${plan.code}</div>
+                
+                <div class="plan-price" style="margin: 1.5rem 0;">
+                    <span style="font-size: 2.5rem; font-weight: 700; color: var(--primary);">$${priceMonthly}</span>
+                    <span style="color: var(--text-light);">/month</span>
+                    ${priceYearly ? `<div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.25rem;">$${priceYearly}/year (save ${Math.round((1 - priceYearly/(priceMonthly*12))*100)}%)</div>` : ''}
+                </div>
+                
+                <div style="background: var(--bg); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; padding: 0.25rem 0; font-size: 0.9rem;">
+                        <span style="color: var(--text-light);"><i class="fas fa-users"></i> Users</span>
+                        <span style="font-weight: 600;">${maxUsers}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.25rem 0; font-size: 0.9rem;">
+                        <span style="color: var(--text-light);"><i class="fas fa-users-cog"></i> Committees</span>
+                        <span style="font-weight: 600;">${maxCommittees}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.25rem 0; font-size: 0.9rem;">
+                        <span style="color: var(--text-light);"><i class="fas fa-hdd"></i> Storage</span>
+                        <span style="font-weight: 600;">${storageDisplay}</span>
+                    </div>
+                </div>
+                
+                ${features.length > 0 ? `
+                <div style="font-weight: 600; margin-bottom: 0.75rem; font-size: 0.9rem;">Features:</div>
+                <ul class="plan-features" style="margin-bottom: 1.5rem;">
+                    ${features.slice(0, 5).map(f => `<li><i class="fas fa-check-circle"></i> ${f}</li>`).join('')}
+                </ul>
+                ` : ''}
+                
+                ${!isCurrentPlan ? `
+                <button class="btn ${isPopular ? 'btn-purple' : 'btn-primary'}" style="width: 100%;" onclick="subscribeToPlan(${plan.id})">
+                    ${currentOrg.subscription_status === 'active' ? '<i class="fas fa-exchange-alt"></i> Switch Plan' : '<i class="fas fa-arrow-right"></i> Subscribe'}
+                </button>
+                ` : `
+                <button class="btn btn-secondary" style="width: 100%;" disabled><i class="fas fa-check"></i> Current Plan</button>
+                `}
+            </div>
+        `}).join('');
+    } catch (error) {
+        console.error('Failed to load plans:', error);
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Failed to load plans</p>
+                <button class="btn btn-secondary" onclick="loadAvailablePlans()" style="margin-top: 1rem;">
+                    <i class="fas fa-sync"></i> Retry
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Load payment methods
+async function loadPaymentMethods() {
+    const container = document.getElementById('paymentMethods');
+    try {
+        const data = await api.get('/billing/payment-methods');
+        
+        if (!data.methods || data.methods.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-credit-card"></i>
+                    <p>No payment methods on file</p>
+                    <button class="btn btn-primary" onclick="openAddPaymentModal()" style="margin-top: 1rem;">
+                        <i class="fas fa-plus"></i> Add Payment Method
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = `
+            <div style="display: grid; gap: 1rem;">
+                ${data.methods.map(method => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <i class="fab fa-cc-${method.card.brand}" style="font-size: 2rem; color: var(--primary);"></i>
+                            <div>
+                                <div style="font-weight: 600;">•••• ${method.card.last4}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-light);">
+                                    Expires ${method.card.exp_month}/${method.card.exp_year}
+                                </div>
+                            </div>
+                        </div>
+                        ${method.is_default ? 
+                            '<span class="badge badge-success">Default</span>' : 
+                            `<button class="btn btn-sm btn-secondary" onclick="setDefaultPaymentMethod('${method.id}')">Set Default</button>`
+                        }
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } catch (error) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Failed to load payment methods</p>
+            </div>
+        `;
+    }
+}
+
+// Load billing history
+async function loadBillingHistory() {
+    const container = document.getElementById('billingHistory');
+    try {
+        const data = await api.get('/billing/invoices');
+        
+        if (!data.invoices || data.invoices.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state" style="padding: 2rem;">
+                    <i class="fas fa-file-invoice"></i>
+                    <p>No invoices yet</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = `
+            <div class="invoice-list">
+                <div class="invoice-list-header">
+                    <div>Invoice #</div>
+                    <div>Date</div>
+                    <div>Amount</div>
+                    <div>Status</div>
+                    <div>Actions</div>
+                </div>
+                ${data.invoices.map(inv => `
+                    <div class="invoice-item">
+                        <div><strong>${inv.number || inv.id}</strong></div>
+                        <div>${new Date(inv.created).toLocaleDateString()}</div>
+                        <div>$${(inv.amount_paid / 100).toFixed(2)}</div>
+                        <div>
+                            <span class="badge badge-${inv.status === 'paid' ? 'success' : inv.status === 'open' ? 'warning' : 'danger'}">
+                                ${inv.status}
+                            </span>
+                        </div>
+                        <div>
+                            ${inv.hosted_invoice_url ? `
+                            <a href="${inv.hosted_invoice_url}" target="_blank" class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            ` : '-'}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } catch (error) {
+        container.innerHTML = `
+            <div class="empty-state" style="padding: 2rem;">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Failed to load invoices</p>
+            </div>
+        `;
+    }
+}
+
+// Open add payment modal
+async function openAddPaymentModal() {
+    const modal = document.getElementById('addPaymentModal');
+    const errorDiv = document.getElementById('paymentError');
+    errorDiv.style.display = 'none';
+    
+    // Initialize Stripe if not already done
+    const initialized = await initStripe();
+    if (!initialized) {
+        errorDiv.textContent = 'Payment system not configured';
+        errorDiv.style.display = 'block';
+        return;
+    }
+    
+    modal.style.display = 'flex';
+    
+    // Get setup intent
+    try {
+        const response = await api.post('/billing/setup-intent', {});
+        setupIntentClientSecret = response.client_secret;
+        
+        // Create payment element
+        elements = stripe.elements({
+            clientSecret: setupIntentClientSecret,
+            appearance: {
+                theme: 'stripe',
+                variables: {
+                    colorPrimary: '#4f46e5',
+                }
+            }
+        });
+        
+        paymentElement = elements.create('payment');
+        paymentElement.mount('#paymentElement');
+    } catch (error) {
+        document.getElementById('paymentElement').innerHTML = `
+            <div class="alert alert-danger">
+                Failed to initialize payment form: ${error.message}
+            </div>
+        `;
+    }
+}
+
+// Close add payment modal
+function closeAddPaymentModal() {
+    const modal = document.getElementById('addPaymentModal');
+    modal.style.display = 'none';
+    
+    // Clean up Stripe elements
+    if (paymentElement) {
+        paymentElement.destroy();
+        paymentElement = null;
+    }
+    elements = null;
+    setupIntentClientSecret = null;
+}
+
+// Submit payment method
+async function submitPaymentMethod() {
+    const submitBtn = document.getElementById('submitPaymentBtn');
+    const errorDiv = document.getElementById('paymentError');
+    
+    if (!stripe || !elements) {
+        errorDiv.textContent = 'Payment system not initialized';
+        errorDiv.style.display = 'block';
+        return;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    
+    try {
+        const { error, setupIntent } = await stripe.confirmSetup({
+            elements,
+            confirmParams: {
+                return_url: window.location.href
+            },
+            redirect: 'if_required'
+        });
+        
+        if (error) {
+            throw new Error(error.message);
+        }
+        
+        if (setupIntent.status === 'succeeded') {
+            showToast('Payment method added successfully', 'success');
+            closeAddPaymentModal();
+            loadPaymentMethods();
+        }
+    } catch (error) {
+        errorDiv.textContent = error.message;
+        errorDiv.style.display = 'block';
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-lock"></i> Save Card';
+    }
+}
+
+// Subscribe to a plan
+async function subscribeToPlan(planId) {
+    try {
+        showToast('Processing subscription...', 'info');
+        
+        const response = await api.post('/billing/checkout', { plan_id: planId });
+        
+        if (response.checkout_url) {
+            // Redirect to Stripe Checkout
+            window.location.href = response.checkout_url;
+        } else if (response.subscription) {
+            // Subscription created directly
+            showToast('Subscription successful!', 'success');
+            loadBillingData();
+        }
+    } catch (error) {
+        showToast(error.message || 'Failed to create subscription', 'error');
+    }
+}
+
+// Open Stripe Customer Portal
+async function openStripePortal() {
+    try {
+        showToast('Opening customer portal...', 'info');
+        
+        const response = await api.post('/billing/portal', {
+            return_url: window.location.href
+        });
+        
+        if (response.url) {
+            window.location.href = response.url;
+        }
+    } catch (error) {
+        showToast(error.message || 'Failed to open portal', 'error');
+    }
+}
+
+// Set default payment method
+async function setDefaultPaymentMethod(methodId) {
+    try {
+        await api.post('/billing/payment-methods/default', { method_id: methodId });
+        showToast('Default payment method updated', 'success');
+        loadPaymentMethods();
+    } catch (error) {
+        showToast(error.message || 'Failed to update default payment method', 'error');
+    }
+}
+
+// Initialize when module loads
+if (document.getElementById('billing')) {
+    loadBillingData();
+}
+</script>
+
+<style>
+.plan-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.plan-card.popular {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+.plan-price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 1rem 0;
+}
+
+.plan-price span {
+    font-size: 1rem;
+    color: var(--text-light);
+    font-weight: 400;
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+    text-align: left;
+}
+
+.plan-features li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.plan-features li:last-child {
+    border-bottom: none;
+}
+
+.plan-features i {
+    color: var(--primary);
+    width: 20px;
+}
+
+.invoice-list {
+    width: 100%;
+}
+
+.invoice-list-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-light);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+}
+
+.invoice-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+}
+
+.invoice-item:last-child {
+    border-bottom: none;
+}
+
+@media (max-width: 768px) {
+    .invoice-list-header,
+    .invoice-item {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+    
+    .invoice-list-header > div:nth-child(3),
+    .invoice-list-header > div:nth-child(4),
+    .invoice-item > div:nth-child(3),
+    .invoice-item > div:nth-child(4) {
+        display: none;
+    }
+}
+</style>

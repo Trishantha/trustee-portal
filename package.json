@@ -1,0 +1,32 @@
+{
+  "name": "trustee-portal",
+  "version": "2.0.0",
+  "description": "Trustee Portal - Charity Governance & Compliance Platform",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "cd apps/api && npm run dev",
+    "dev:web": "npx serve apps/web/src/pages",
+    "build": "cd apps/api && npm run build",
+    "test": "cd apps/api && npm test",
+    "lint": "cd apps/api && npm run lint",
+    "db:migrate": "cd apps/api && npm run db:migrate",
+    "db:studio": "cd apps/api && npm run db:studio",
+    "setup": "npm install && cd apps/api && npm install"
+  },
+  "keywords": [
+    "charity",
+    "governance",
+    "compliance",
+    "trustee",
+    "board-management"
+  ],
+  "author": "Trustee Portal Team",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

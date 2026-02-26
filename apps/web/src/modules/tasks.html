@@ -1,0 +1,29 @@
+<!-- Tasks Module -->
+<div class="module-section" id="tasks">
+    <div class="card">
+        <div class="card-header">
+            <h3>My Tasks & Milestones</h3>
+            <div class="admin-only">
+                <button class="btn btn-primary" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;" onclick="openModal('newTask')">
+                    <i class="fas fa-plus"></i> Assign
+                </button>
+            </div>
+        </div>
+        <div class="card-body" style="padding: 0;" id="tasksList">
+            <!-- Tasks loaded dynamically from API -->
+            <div style="padding: 3rem; text-align: center; color: var(--text-light);">
+                <i class="fas fa-tasks" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p>Loading tasks...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card admin-only" id="allTasksCard" style="display: none;">
+        <div class="card-header">
+            <h3>All Tasks</h3>
+        </div>
+        <div class="card-body" style="padding: 0;" id="allTasksList">
+            <!-- All tasks loaded dynamically for admins -->
+        </div>
+    </div>
+</div>

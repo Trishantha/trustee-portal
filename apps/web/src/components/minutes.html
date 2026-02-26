@@ -1,0 +1,22 @@
+<!-- Minutes Module -->
+<div class="module-section" id="minutes">
+    <div class="card">
+        <div class="card-header">
+            <h3>Meeting Minutes & Records</h3>
+            <div class="admin-only-flex gap-2">
+                <button class="btn btn-secondary" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;" onclick="showToast('Opening upload dialog...', 'success')">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="document-grid" id="minutesList">
+                <!-- Documents loaded dynamically -->
+                <div style="grid-column: 1 / -1; padding: 3rem; text-align: center; color: var(--text-light);">
+                    <i class="fas fa-file-alt" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Loading documents...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

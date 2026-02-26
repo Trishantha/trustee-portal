@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Plans - Trustee Portal</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #0f766e;
+            --accent: #f59e0b;
+            --danger: #dc2626;
+            --success: #059669;
+            --warning: #d97706;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .plans-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .plan-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .plan-card.popular {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+        
+        .plan-card.popular:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .plan-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-code {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .plan-price {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .price-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .price-amount span {
+            font-size: 1rem;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+        
+        .price-yearly {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+        
+        .plan-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .plan-features li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text);
+        }
+        
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .plan-features i {
+            color: var(--success);
+            width: 20px;
+        }
+        
+        .plan-limits {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .limit-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .limit-label {
+            color: var(--text-light);
+        }
+        
+        .limit-value {
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+        
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-accent:hover {
+            background: #d97706;
+        }
+        
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+        
+        .loading {
+            text-align: center;
+            color: white;
+            padding: 3rem;
+        }
+        
+        .loading i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .error {
+            text-align: center;
+            color: white;
+            padding: 3rem;
+            background: rgba(220, 38, 38, 0.2);
+            border-radius: 16px;
+        }
+        
+        .error i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .features-title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .plan-card.popular {
+                transform: none;
+            }
+            
+            .plan-card.popular:hover {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Portal
+        </a>
+        
+        <div class="header">
+            <h1><i class="fas fa-crown"></i> Subscription Plans</h1>
+            <p>Choose the perfect plan for your organization</p>
+        </div>
+        
+        <div id="plansContainer" class="plans-container">
+            <div class="loading">
+                <i class="fas fa-spinner"></i>
+                <p>Loading subscription plans...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    
+    <script>
+        // Supabase configuration - using the same credentials as your backend
+        const SUPABASE_URL = 'https://ybyiwecyyvqvgzrzhzqp.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlieWl3ZWN5eXZxdmd6cnpoenFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1MTk4OTYsImV4cCI6MjA4NzA5NTg5Nn0.J_NczFRW5zHG-E8-3_VxBvcvo-pY6TM1QRZtXYGmTMw';
+        
+        // Initialize Supabase client
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Format storage size
+        function formatStorage(mb) {
+            if (mb >= 1024) {
+                return (mb / 1024).toFixed(0) + ' GB';
+            }
+            return mb + ' MB';
+        }
+        
+        // Parse features from JSON
+        function parseFeatures(features) {
+            if (!features) return [];
+            if (typeof features === 'string') {
+                try {
+                    return JSON.parse(features);
+                } catch (e) {
+                    return features.split(',').map(f => f.trim());
+                }
+            }
+            if (Array.isArray(features)) return features;
+            return [];
+        }
+        
+        // Fetch and display plans
+        async function loadPlans() {
+            const container = document.getElementById('plansContainer');
+            
+            try {
+                console.log('Fetching plans from Supabase...');
+                
+                const { data: plans, error } = await supabase
+                    .from('subscription_plans')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('price_monthly', { ascending: true });
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('Plans fetched:', plans);
+                
+                if (!plans || plans.length === 0) {
+                    container.innerHTML = `
+                        <div class="error" style="grid-column: 1 / -1;">
+                            <i class="fas fa-inbox"></i>
+                            <h3>No Plans Found</h3>
+                            <p>No subscription plans are currently available.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Render plans
+                container.innerHTML = plans.map((plan, index) => {
+                    const features = parseFeatures(plan.features);
+                    const isPopular = plan.is_popular || index === 2; // Make Standard popular by default
+                    const isTrial = plan.price_monthly === 0;
+                    
+                    return `
+                        <div class="plan-card ${isPopular ? 'popular' : ''}">
+                            ${isPopular ? '<span class="popular-badge"><i class="fas fa-star"></i> MOST POPULAR</span>' : ''}
+                            
+                            <div class="plan-header">
+                                <div class="plan-name">${plan.name}</div>
+                                <div class="plan-code">${plan.code}</div>
+                            </div>
+                            
+                            <div class="plan-price">
+                                <div class="price-amount">
+                                    $${plan.price_monthly || 0}<span>/month</span>
+                                </div>
+                                ${plan.price_yearly ? `
+                                <div class="price-yearly">
+                                    $${plan.price_yearly}/year (save ${Math.round((1 - plan.price_yearly / (plan.price_monthly * 12)) * 100)}%)
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="plan-limits">
+                                <div class="limit-item">
+                                    <span class="limit-label"><i class="fas fa-users"></i> Users</span>
+                                    <span class="limit-value">${plan.max_trustees || 'Unlimited'}</span>
+                                </div>
+                                <div class="limit-item">
+                                    <span class="limit-label"><i class="fas fa-users-cog"></i> Committees</span>
+                                    <span class="limit-value">${plan.max_committees || plan.code === 'enterprise' ? 'Unlimited' : (plan.max_committees || '3')}</span>
+                                </div>
+                                <div class="limit-item">
+                                    <span class="limit-label"><i class="fas fa-hdd"></i> Storage</span>
+                                    <span class="limit-value">${formatStorage(plan.max_storage_mb || 5120)}</span>
+                                </div>
+                            </div>
+                            
+                            ${features.length > 0 ? `
+                            <div class="features-title">Features included:</div>
+                            <ul class="plan-features">
+                                ${features.map(feature => `
+                                    <li><i class="fas fa-check-circle"></i> ${feature}</li>
+                                `).join('')}
+                            </ul>
+                            ` : ''}
+                            
+                            <button class="btn ${isPopular ? 'btn-accent' : isTrial ? 'btn-secondary' : 'btn-primary'}" 
+                                    onclick="selectPlan(${plan.id}, '${plan.name}')">
+                                ${isTrial ? '<i class="fas fa-play"></i> Start Free Trial' : 
+                                  isPopular ? '<i class="fas fa-crown"></i> Choose This Plan' : 
+                                  '<i class="fas fa-arrow-right"></i> Select Plan'}
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading plans:', error);
+                container.innerHTML = `
+                    <div class="error" style="grid-column: 1 / -1;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Failed to Load Plans</h3>
+                        <p>${error.message || 'Could not connect to the database. Please try again later.'}</p>
+                        <button onclick="loadPlans()" class="btn btn-primary" style="margin-top: 1rem; max-width: 200px;">
+                            <i class="fas fa-sync"></i> Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Handle plan selection
+        function selectPlan(planId, planName) {
+            // Store selected plan in localStorage for use in signup
+            localStorage.setItem('selected_plan_id', planId);
+            localStorage.setItem('selected_plan_name', planName);
+            
+            // Show confirmation
+            alert(`You selected the ${planName} plan!\n\nRedirecting to registration...`);
+            
+            // Redirect to main app
+            window.location.href = 'index.html';
+        }
+        
+        // Load plans when page loads
+        document.addEventListener('DOMContentLoaded', loadPlans);
+    </script>
+</body>
+</html>
