@@ -1,0 +1,676 @@
+<!-- Trustees Module - Member Directory & Communication -->
+<div class="module-section" id="trustees">
+    <div class="flex justify-between items-center mb-4" style="flex-wrap: wrap; gap: 0.5rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 700;">Trustees & Members</h2>
+        <div class="flex gap-2">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="trusteeSearch" placeholder="Search trustees..." onkeyup="filterTrustees()">
+            </div>
+            <select id="trusteeFilter" class="btn btn-secondary" style="font-size: 0.85rem; width: auto;" onchange="filterTrustees()">
+                <option value="">All Members</option>
+                <option value="active">Active</option>
+                <option value="term-ending">Term Ending Soon</option>
+                <option value="expired">Term Expired</option>
+            </select>
+            <button class="btn btn-primary admin-chair-only" style="display: none;" onclick="openAddTrusteeModal()">
+                <i class="fas fa-plus"></i> Add Trustee
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="dashboard-grid" style="margin-bottom: 1.5rem;">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value" id="totalTrustees">-</div>
+                    <div class="stat-label">Total Members</div>
+                </div>
+                <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+            </div>
+        </div>
+        <div class="stat-card warning">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value" id="termEndingSoon">-</div>
+                    <div class="stat-label">Term Ending (90 days)</div>
+                </div>
+                <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+            </div>
+        </div>
+        <div class="stat-card danger">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value" id="termExpired">-</div>
+                    <div class="stat-label">Term Expired</div>
+                </div>
+                <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+            </div>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value" id="avgTermLength">-</div>
+                    <div class="stat-label">Avg Term (Years)</div>
+                </div>
+                <div class="stat-icon green"><i class="fas fa-chart-line"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="view-toggle" style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+        <button class="btn btn-secondary view-btn active" id="cardViewBtn" onclick="switchView('cards')" title="Card View">
+            <i class="fas fa-th-large"></i> Cards
+        </button>
+        <button class="btn btn-secondary view-btn" id="listViewBtn" onclick="switchView('list')" title="List View">
+            <i class="fas fa-list"></i> List
+        </button>
+    </div>
+
+    <!-- Trustees Grid (Card View) -->
+    <div class="trustees-grid" id="trusteesGrid">
+        <!-- Trustees loaded dynamically -->
+        <div style="grid-column: 1 / -1; padding: 3rem; text-align: center; color: var(--text-light);">
+            <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+            <p>Loading trustees...</p>
+        </div>
+    </div>
+
+    <!-- Trustees List (List View) -->
+    <div class="trustees-list" id="trusteesList" style="display: none;">
+        <!-- List Header -->
+        <div class="list-header">
+            <div class="list-col-member">Member</div>
+            <div class="list-col-role">Role</div>
+            <div class="list-col-dept">Department</div>
+            <div class="list-col-status">Term Status</div>
+            <div class="list-col-ends">Term Ends</div>
+            <div class="list-col-actions">Actions</div>
+        </div>
+        <!-- List Body -->
+        <div class="list-body" id="trusteesListBody">
+            <!-- Loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="noTrusteesMsg" style="display: none; padding: 3rem; text-align: center; color: var(--text-light);">
+        <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+        <p>No trustees found</p>
+    </div>
+</div>
+
+<!-- Trustee Detail Modal -->
+<div class="modal-overlay" id="trusteeDetailModal" style="display: none;">
+    <div class="modal" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2>Trustee Profile</h2>
+            <button class="modal-close" onclick="closeTrusteeDetailModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="trusteeDetailContent">
+            <!-- Populated dynamically -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeTrusteeDetailModal()">Close</button>
+            <button class="btn btn-primary" onclick="sendMessageToTrustee()">
+                <i class="fas fa-envelope"></i> Send Message
+            </button>
+            <button class="btn btn-danger admin-chair-only" style="display: none;" onclick="removeTrustee()">
+                <i class="fas fa-trash"></i> Remove
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Trustee Modal (Admin/Chair Only) -->
+<div class="modal-overlay" id="addTrusteeModal" style="display: none;">
+    <div class="modal" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2>Add New Trustee</h2>
+            <button class="modal-close" onclick="closeAddTrusteeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>First Name *</label>
+                <input type="text" id="newTrusteeFirstName" placeholder="Enter first name">
+            </div>
+            <div class="form-group">
+                <label>Last Name *</label>
+                <input type="text" id="newTrusteeLastName" placeholder="Enter last name">
+            </div>
+            <div class="form-group">
+                <label>Email Address *</label>
+                <input type="email" id="newTrusteeEmail" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label>Role *</label>
+                <select id="newTrusteeRole">
+                    <option value="trustee">Trustee</option>
+                    <option value="chair">Chair</option>
+                    <option value="secretary">Secretary</option>
+                    <option value="admin">Admin</option>
+                    <option value="viewer">Viewer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Department</label>
+                <input type="text" id="newTrusteeDepartment" placeholder="e.g., Finance">
+            </div>
+            <div class="form-group">
+                <label>Term Length *</label>
+                <select id="newTrusteeTermLength">
+                    <option value="1">1 Year</option>
+                    <option value="2">2 Years</option>
+                    <option value="3" selected>3 Years</option>
+                    <option value="4">4 Years</option>
+                    <option value="5">5 Years</option>
+                    <option value="6">6 Years</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Start Date *</label>
+                <input type="date" id="newTrusteeStartDate" value="">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeAddTrusteeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitNewTrustee()">
+                <i class="fas fa-plus"></i> Add Trustee
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Renew Term Modal (Admin/Chair Only) -->
+<div class="modal-overlay" id="renewTermModal" style="display: none;">
+    <div class="modal" style="max-width: 450px;">
+        <div class="modal-header">
+            <h2>Renew Trustee Term</h2>
+            <button class="modal-close" onclick="closeRenewTermModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Trustee</label>
+                <p id="renewTrusteeName" style="font-weight: 600; margin-top: 0.5rem;"></p>
+            </div>
+            <div class="form-group">
+                <label>Current Term Ends</label>
+                <p id="renewCurrentEndDate" style="color: var(--text-light); margin-top: 0.5rem;"></p>
+            </div>
+            <div class="form-group">
+                <label>New Term Length *</label>
+                <select id="renewTermLength">
+                    <option value="1">1 Year</option>
+                    <option value="2">2 Years</option>
+                    <option value="3" selected>3 Years</option>
+                    <option value="4">4 Years</option>
+                    <option value="5">5 Years</option>
+                    <option value="6">6 Years</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Notes</label>
+                <textarea id="renewNotes" rows="3" placeholder="Optional notes about this renewal..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeRenewTermModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitTermRenewal()">
+                <i class="fas fa-sync"></i> Renew Term
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.trustees-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.trustee-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 2px solid var(--border);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.trustee-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.trustee-card.term-ending {
+    border-color: var(--warning);
+    background: linear-gradient(135deg, #fffbeb 0%, var(--card) 100%);
+}
+
+.trustee-card.term-expired {
+    border-color: var(--danger);
+    background: linear-gradient(135deg, #fef2f2 0%, var(--card) 100%);
+}
+
+.trustee-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.trustee-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.trustee-info h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.trustee-info p {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.trustee-role {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    text-transform: capitalize;
+}
+
+.trustee-role.owner { background: #fef3c7; color: #92400e; }
+.trustee-role.admin { background: #dbeafe; color: #1e40af; }
+.trustee-role.chair { background: #d1fae5; color: #065f46; }
+.trustee-role.secretary { background: #fce7f3; color: #9d174d; }
+.trustee-role.trustee { background: #f3f4f6; color: #374151; }
+.trustee-role.viewer { background: #e0e7ff; color: #3730a3; }
+
+.trustee-term {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.term-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.term-label {
+    color: var(--text-light);
+}
+
+.term-value {
+    font-weight: 600;
+}
+
+.term-progress {
+    margin-top: 0.5rem;
+}
+
+.term-progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.term-progress-fill {
+    height: 100%;
+    background: var(--success);
+    transition: width 0.3s;
+}
+
+.term-progress-fill.ending {
+    background: var(--warning);
+}
+
+.term-progress-fill.expired {
+    background: var(--danger);
+}
+
+.term-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.term-status.active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.term-status.ending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.term-status.expired {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.trustee-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.trustee-actions button {
+    flex: 1;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-box i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+}
+
+.search-box input {
+    padding-left: 2.5rem;
+    width: 250px;
+}
+
+/* View Toggle */
+.view-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.view-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.view-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* List View Styles - Modern Card List */
+.trustees-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* List Header */
+.list-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr 1fr;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--background);
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.list-col-member { grid-column: 1; }
+.list-col-role { grid-column: 2; }
+.list-col-dept { grid-column: 3; }
+.list-col-status { grid-column: 4; }
+.list-col-ends { grid-column: 5; }
+.list-col-actions { grid-column: 6; text-align: right; }
+
+/* List Body */
+.list-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* List Item */
+.list-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    align-items: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.list-item:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+}
+
+.list-item.term-ending {
+    border-left: 3px solid var(--warning);
+    background: linear-gradient(to right, #fffbeb 0%, var(--card) 100%);
+}
+
+.list-item.term-expired {
+    border-left: 3px solid var(--danger);
+    background: linear-gradient(to right, #fef2f2 0%, var(--card) 100%);
+}
+
+/* List Member Cell */
+.list-member {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+}
+
+.list-member-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.list-member-info h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.2rem;
+}
+
+.list-member-info p {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+/* List Role Badge */
+.list-role {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    width: fit-content;
+}
+
+.list-role.owner { background: #fef3c7; color: #92400e; }
+.list-role.admin { background: #dbeafe; color: #1e40af; }
+.list-role.chair { background: #d1fae5; color: #065f46; }
+.list-role.secretary { background: #fce7f3; color: #9d174d; }
+.list-role.trustee { background: #f3f4f6; color: #374151; }
+.list-role.viewer { background: #e0e7ff; color: #3730a3; }
+
+/* List Department */
+.list-dept {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+/* List Status */
+.list-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.list-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    width: fit-content;
+}
+
+.list-status-badge.active { background: #d1fae5; color: #065f46; }
+.list-status-badge.ending { background: #fef3c7; color: #92400e; }
+.list-status-badge.expired { background: #fee2e2; color: #991b1b; }
+
+/* List Progress Bar */
+.list-progress {
+    width: 100%;
+    max-width: 120px;
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.list-progress-fill {
+    height: 100%;
+    background: var(--success);
+    transition: width 0.3s;
+}
+
+.list-progress-fill.ending { background: var(--warning); }
+.list-progress-fill.expired { background: var(--danger); }
+
+/* List Date */
+.list-date {
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.list-date.ending { color: var(--warning); }
+.list-date.expired { color: var(--danger); }
+
+/* List Actions */
+.list-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.list-actions button {
+    padding: 0.5rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.list-actions button i {
+    font-size: 0.9rem;
+}
+
+/* Responsive List View */
+@media (max-width: 1024px) {
+    .list-header {
+        display: none;
+    }
+    
+    .list-item {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+    
+    .list-item > div {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .list-item > div::before {
+        font-weight: 600;
+        color: var(--text-light);
+        font-size: 0.75rem;
+        min-width: 80px;
+    }
+    
+    .list-col-member::before { content: 'Member:'; }
+    .list-col-role::before { content: 'Role:'; }
+    .list-col-dept::before { content: 'Dept:'; }
+    .list-col-status::before { content: 'Status:'; }
+    .list-col-ends::before { content: 'Ends:'; }
+    .list-col-actions::before { content: 'Actions:'; }
+    
+    .list-actions {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .trustees-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .search-box input {
+        width: 100%;
+    }
+}
+</style>

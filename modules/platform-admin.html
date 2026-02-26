@@ -1,0 +1,915 @@
+<!-- Platform Admin Dashboard (Super Admin Only) -->
+<div class="module-section" id="platformAdmin">
+    <!-- Header -->
+    <div class="platform-admin-header">
+        <div class="platform-logo">
+            <i class="fas fa-server"></i>
+        </div>
+        <div>
+            <h1>Platform Administration</h1>
+            <p>SaaS Management Dashboard</p>
+        </div>
+        <div class="platform-badge">
+            <span class="badge-super">SUPER ADMIN</span>
+        </div>
+    </div>
+
+    <!-- Clean Quick Actions Bar -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-body" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+            <span style="font-weight: 600; color: var(--text-light);">Quick Actions:</span>
+            <button class="btn btn-secondary btn-sm" onclick="loadDashboardSummary()">
+                <i class="fas fa-sync"></i> Refresh Data
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="exportPlatformData()">
+                <i class="fas fa-download"></i> Export All Data
+            </button>
+            <div style="margin-left: auto; display: flex; gap: 1rem; align-items: center;">
+                <!-- Currency Selector -->
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-coins" style="color: var(--text-light); font-size: 0.85rem;"></i>
+                    <select id="platformCurrencySelector" class="btn btn-secondary btn-sm" style="font-size: 0.85rem; width: auto; min-width: 100px;" onchange="handleCurrencyChange(this.value)">
+                        <option value="GBP">£ GBP - British Pound</option>
+                        <option value="USD">$ USD - US Dollar</option>
+                        <option value="EUR">€ EUR - Euro</option>
+                        <option value="CAD">C$ CAD - Canadian Dollar</option>
+                        <option value="AUD">A$ AUD - Australian Dollar</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span class="status-indicator" id="emailStatusIndicator" style="background: #ef4444;"></span>
+                    <span style="font-size: 0.85rem; color: var(--text-light);">Email</span>
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span class="status-indicator" id="stripeStatusIndicator" style="background: #ef4444;"></span>
+                    <span style="font-size: 0.85rem; color: var(--text-light);">Stripe</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="platform-tabs">
+        <button class="tab-btn active" data-tab="clients" onclick="switchPlatformTab('clients')">
+            <i class="fas fa-building"></i> Client List
+        </button>
+        <button class="tab-btn" data-tab="analytics" onclick="switchPlatformTab('analytics')">
+            <i class="fas fa-chart-line"></i> Analytics
+        </button>
+        <button class="tab-btn" data-tab="revenue" onclick="switchPlatformTab('revenue')">
+            <i class="fas fa-dollar-sign"></i> Revenue
+        </button>
+        <button class="tab-btn" data-tab="health" onclick="switchPlatformTab('health')">
+            <i class="fas fa-heartbeat"></i> Health
+            <span class="badge" id="healthBadge" style="display: none;">0</span>
+        </button>
+        <button class="tab-btn" data-tab="plans" onclick="switchPlatformTab('plans')">
+            <i class="fas fa-tags"></i> Plans
+        </button>
+        <button class="tab-btn" data-tab="whitelabel" onclick="switchPlatformTab('whitelabel')">
+            <i class="fas fa-paint-brush"></i> White-Label
+        </button>
+        <button class="tab-btn" data-tab="activity" onclick="switchPlatformTab('activity')">
+            <i class="fas fa-history"></i> Activity
+        </button>
+    </div>
+
+    <!-- Tab Content: Client List -->
+    <div class="tab-content active" id="clientsTab">
+        <!-- Add New Organization Card -->
+        <div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white;">
+            <div class="card-body" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h3 style="margin-bottom: 0.25rem; color: white;"><i class="fas fa-building"></i> Organizations</h3>
+                    <p style="opacity: 0.9; font-size: 0.9rem;">Manage all client organizations on the platform</p>
+                </div>
+                <button class="btn btn-accent" onclick="openNewOrgModal()" style="background: white; color: var(--primary); font-weight: 600;">
+                    <i class="fas fa-plus"></i> Add New Organization
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-list"></i> All Organizations</h3>
+                <div class="flex gap-2">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="clientSearch" placeholder="Search by Client ID (ABC-DEF-GHI-JKL), name, email..." onkeyup="filterClients()">
+                    </div>
+                    <select id="orgStatusFilter" class="btn btn-secondary" style="font-size: 0.85rem; width: auto;" onchange="filterClients()">
+                        <option value="">All Status</option>
+                        <option value="trial">Trial</option>
+                        <option value="active">Active</option>
+                        <option value="past_due">Past Due</option>
+                        <option value="suspended">Suspended</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div class="client-list" id="clientList">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading clients...</p>
+                    </div>
+                </div>
+                <div id="noClientsMsg" class="empty-state" style="display: none;">
+                    <i class="fas fa-building"></i>
+                    <p>No organizations found</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content: Analytics Dashboard -->
+    <div class="tab-content" id="analyticsTab">
+        <!-- Key Metrics Overview -->
+        <div class="dashboard-grid" style="margin-bottom: 1.5rem;">
+            <div class="stat-card primary">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="totalOrganizations">-</div>
+                        <div class="stat-label">Total Organizations</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-building"></i></div>
+                </div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="activeSubscriptions">-</div>
+                        <div class="stat-label">Active Subscriptions</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                </div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="trialOrganizations">-</div>
+                        <div class="stat-label">In Trial</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                </div>
+            </div>
+            <div class="stat-card purple">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="monthlyRevenue">-</div>
+                        <div class="stat-label">Monthly Revenue</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary Analytics Stats -->
+        <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 1.5rem;">
+            <div class="stat-card info">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="analyticsTotalUsers">-</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                </div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="analyticsChurnRate">-</div>
+                        <div class="stat-label">Churn Rate</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-user-minus"></i></div>
+                </div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="analyticsConversionRate">-</div>
+                        <div class="stat-label">Trial Conversion</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+                </div>
+            </div>
+            <div class="stat-card primary">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="analyticsNetGrowth">-</div>
+                        <div class="stat-label">Net Growth (30d)</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid" style="grid-template-columns: 2fr 1fr;">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Growth Trends</h3>
+                    <select id="growthPeriod" class="btn btn-secondary btn-sm" onchange="loadGrowthMetrics()">
+                        <option value="30">Last 30 Days</option>
+                        <option value="60">Last 60 Days</option>
+                        <option value="90">Last 90 Days</option>
+                    </select>
+                </div>
+                <div class="card-body">
+                    <div id="growthChart" style="min-height: 300px;">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading growth data...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-sign-in-alt"></i> Signups by Plan</h3>
+                </div>
+                <div class="card-body" id="signupsByPlan">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content: Revenue -->
+    <div class="tab-content" id="revenueTab">
+        <div class="dashboard-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 1.5rem;">
+            <div class="stat-card success">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="revenueMRR">-</div>
+                        <div class="stat-label">Monthly Recurring Revenue</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-sync"></i></div>
+                </div>
+            </div>
+            <div class="stat-card primary">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="revenueARR">-</div>
+                        <div class="stat-label">Annual Run Rate</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
+                </div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="revenueChurn">-</div>
+                        <div class="stat-label">Revenue Churn (90d)</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid" style="grid-template-columns: 2fr 1fr;">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-area"></i> Revenue by Plan</h3>
+                </div>
+                <div class="card-body" id="revenueByPlan">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading revenue data...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-file-invoice-dollar"></i> Monthly Breakdown</h3>
+                </div>
+                <div class="card-body" style="padding: 0; max-height: 400px; overflow-y: auto;">
+                    <div id="monthlyRevenueList">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content: Health -->
+    <div class="tab-content" id="healthTab">
+        <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 1.5rem;">
+            <div class="stat-card warning">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="healthAtRisk">-</div>
+                        <div class="stat-label">At Risk</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                </div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="healthPastDue">-</div>
+                        <div class="stat-label">Past Due</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                </div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="healthInactive">-</div>
+                        <div class="stat-label">Inactive (30d)</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-bed"></i></div>
+                </div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="healthActive">-</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-running"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-header">
+                <h3><i class="fas fa-exclamation-circle"></i> Organizations Near Limits</h3>
+                <button class="btn btn-sm btn-secondary" onclick="loadUsageWarnings()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+            <div class="card-body" id="usageWarnings">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading usage warnings...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-hourglass-end"></i> Trials Expiring Soon</h3>
+                </div>
+                <div class="card-body" id="trialsExpiring">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-ban"></i> Recent Cancellations</h3>
+                </div>
+                <div class="card-body" id="recentCancellations">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cache Management -->
+        <div class="card" style="margin-top: 1.5rem;">
+            <div class="card-header">
+                <h3><i class="fas fa-broom"></i> Cache Management</h3>
+                <div>
+                    <button class="btn btn-sm btn-secondary" onclick="checkCacheStatus()">
+                        <i class="fas fa-sync"></i> Check Status
+                    </button>
+                    <button class="btn btn-sm btn-primary" onclick="clearServerCache()">
+                        <i class="fas fa-trash"></i> Clear Cache
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="cacheStatus" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value" id="cacheMemory">-</div>
+                                <div class="stat-label">Memory Used</div>
+                            </div>
+                            <div class="stat-icon"><i class="fas fa-memory"></i></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value" id="cacheUptime">-</div>
+                                <div class="stat-label">Server Uptime</div>
+                            </div>
+                            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value" id="cacheModules">-</div>
+                                <div class="stat-label">Cached Modules</div>
+                            </div>
+                            <div class="stat-icon"><i class="fas fa-cube"></i></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value" id="cacheDbStatus">-</div>
+                                <div class="stat-label">DB Connection</div>
+                            </div>
+                            <div class="stat-icon"><i class="fas fa-database"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="cacheMessage" style="margin-top: 1rem; padding: 0.75rem; border-radius: 6px; display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content: Subscription Plans -->
+    <div class="tab-content" id="plansTab">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-tags"></i> Subscription Plans</h3>
+                <button class="btn btn-primary" onclick="openPlanModal()">
+                    <i class="fas fa-plus"></i> Add Plan
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="plans-grid" id="plansGrid">
+                    <!-- Plans loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content: White-Label -->
+    <div class="tab-content" id="whitelabelTab">
+        <div class="dashboard-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 1.5rem;">
+            <div class="stat-card primary">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="wlTotalCustom">-</div>
+                        <div class="stat-label">Custom Branded</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-paint-brush"></i></div>
+                </div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="wlCustomDomains">-</div>
+                        <div class="stat-label">Custom Domains</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-globe"></i></div>
+                </div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="wlDefault">-</div>
+                        <div class="stat-label">Default Branding</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-circle"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-list"></i> Organizations with Custom Domains</h3>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div id="customDomainsList">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading custom domains...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content: Platform Activity -->
+    <div class="tab-content" id="activityTab">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-history"></i> Platform Activity</h3>
+                <div class="flex gap-2">
+                    <div class="search-box" style="width: 250px;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="activitySearch" placeholder="Search by ID, date, action..." onkeyup="filterActivities()">
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadPlatformActivity()">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div class="activity-table-container" id="platformActivity" style="overflow-x: auto;">
+                    <!-- Activity table loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    .activity-table-container table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+    .activity-table-container th {
+        background: var(--bg-light);
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid var(--border);
+        white-space: nowrap;
+    }
+    .activity-table-container td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    .activity-table-container tr:hover {
+        background: var(--bg-light);
+    }
+    .activity-table-container .badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    .activity-table-container .badge-success { background: #dcfce7; color: #166534; }
+    .activity-table-container .badge-primary { background: #dbeafe; color: #1e40af; }
+    .activity-table-container .badge-info { background: #e0f2fe; color: #075985; }
+    .activity-table-container .badge-warning { background: #fef3c7; color: #92400e; }
+    .activity-table-container .badge-danger { background: #fee2e2; color: #991b1b; }
+    .activity-table-container .badge-secondary { background: #f3f4f6; color: #4b5563; }
+    </style>
+
+    <!-- New Organization Modal -->
+    <div class="modal-overlay" id="newOrgModal" style="display: none;">
+        <div class="modal" style="max-width: 550px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2><i class="fas fa-building"></i> Create New Organization</h2>
+                <button class="modal-close" onclick="closeNewOrgModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4 style="margin-bottom: 1rem; color: var(--primary);">Organization Details</h4>
+                <div class="form-group">
+                    <label>Organization Name *</label>
+                    <input type="text" id="newOrgName" placeholder="e.g., Acme Corporation" onblur="generateSlug()">
+                </div>
+                <div class="form-row" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Slug *</label>
+                        <input type="text" id="newOrgSlug" placeholder="e.g., acme-corp">
+                        <span class="help-text">Used for subdomain: slug.trusteeportal.com</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Subscription Plan *</label>
+                        <select id="newOrgPlan">
+                            <option value="1">Starter ($49/mo)</option>
+                            <option value="2" selected>Professional ($149/mo)</option>
+                            <option value="3">Enterprise ($399/mo)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border);">
+                
+                <h4 style="margin-bottom: 1rem; color: var(--primary);">Admin User</h4>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>First Name *</label>
+                        <input type="text" id="newOrgAdminFirstName" placeholder="John">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name *</label>
+                        <input type="text" id="newOrgAdminLastName" placeholder="Doe">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Admin Email *</label>
+                    <input type="email" id="newOrgAdminEmail" placeholder="admin@company.com">
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="newOrgAdminPassword" placeholder="Min 8 characters">
+                    <button type="button" class="btn btn-sm btn-secondary" style="margin-top: 0.5rem;" onclick="generatePassword()">
+                        <i class="fas fa-key"></i> Generate Password
+                    </button>
+                </div>
+                
+                <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border);">
+                
+                <h4 style="margin-bottom: 1rem; color: var(--primary);">Term Settings (Optional)</h4>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Default Term Length</label>
+                        <select id="newOrgTermLength">
+                            <option value="1">1 Year</option>
+                            <option value="2">2 Years</option>
+                            <option value="3" selected>3 Years</option>
+                            <option value="4">4 Years</option>
+                            <option value="5">5 Years</option>
+                            <option value="6">6 Years</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Renewal Notification (days)</label>
+                        <input type="number" id="newOrgRenewalDays" value="90" min="1" max="365">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeNewOrgModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitNewOrganization()">
+                    <i class="fas fa-plus"></i> Create Organization
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Organization Modal -->
+    <div class="modal-overlay" id="viewOrgModal" style="display: none;">
+        <div class="modal" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2><i class="fas fa-building"></i> Organization Details</h2>
+                <button class="modal-close" onclick="closeViewOrgModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="viewOrgContent">
+                <!-- Loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeViewOrgModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Plan Modal -->
+    <div class="modal-overlay" id="changePlanModal" style="display: none;">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-exchange-alt"></i> Change Subscription Plan</h2>
+                <button class="modal-close" onclick="closeChangePlanModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="changePlanOrgId">
+                <div class="form-group">
+                    <label>Organization</label>
+                    <input type="text" id="changePlanOrgName" readonly style="background: var(--bg-light); font-weight: 600;">
+                </div>
+                <div class="form-group">
+                    <label>Current Plan</label>
+                    <input type="text" id="changePlanCurrentPlan" readonly style="background: var(--bg-light);">
+                </div>
+                <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border);">
+                <div class="form-group">
+                    <label>New Plan *</label>
+                    <select id="changePlanNewPlan">
+                        <!-- Plans loaded dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Billing Cycle *</label>
+                    <select id="changePlanBillingCycle">
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly (Save 15%)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Change Type *</label>
+                    <select id="changePlanType">
+                        <option value="manual">Manual Change</option>
+                        <option value="complimentary">Complimentary/Free</option>
+                        <option value="upgrade">Upgrade</option>
+                        <option value="downgrade">Downgrade</option>
+                        <option value="promotional">Promotional Offer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reason/Notes</label>
+                    <textarea id="changePlanReason" rows="3" placeholder="Enter reason for plan change..."></textarea>
+                    <span class="help-text">This will be logged for audit purposes</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeChangePlanModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitPlanChange()">
+                    <i class="fas fa-check"></i> Change Plan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Plan Modal -->
+    <div class="modal-overlay" id="addPlanModal" style="display: none;">
+        <div class="modal" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus"></i> Add Subscription Plan</h2>
+                <button class="modal-close" onclick="closeAddPlanModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Plan Name *</label>
+                        <input type="text" id="addPlanName" placeholder="e.g., Professional">
+                    </div>
+                    <div class="form-group">
+                        <label>Code/Slug *</label>
+                        <input type="text" id="addPlanSlug" placeholder="e.g., professional" style="text-transform: lowercase;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="addPlanDescription" placeholder="Brief description of the plan">
+                </div>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label id="addPlanMonthlyLabel">Monthly Price (£) *</label>
+                        <input type="number" id="addPlanPriceMonthly" min="0" step="0.01" value="49">
+                    </div>
+                    <div class="form-group">
+                        <label id="addPlanYearlyLabel">Yearly Price (£) *</label>
+                        <input type="number" id="addPlanPriceYearly" min="0" step="0.01" value="490">
+                        <span class="help-text">Usually 10x monthly (2 months free)</span>
+                    </div>
+                </div>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Max Users *</label>
+                        <input type="number" id="addPlanMaxUsers" min="1" value="5">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Committees</label>
+                        <input type="number" id="addPlanMaxCommittees" min="1" value="3">
+                    </div>
+                    <div class="form-group">
+                        <label>Storage (MB)</label>
+                        <input type="number" id="addPlanMaxStorage" min="1" value="5120">
+                        <span class="help-text">1024 = 1GB</span>
+                    </div>
+                </div>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Stripe Price ID (Monthly)</label>
+                        <input type="text" id="addPlanStripeMonthly" placeholder="price_xxx">
+                    </div>
+                    <div class="form-group">
+                        <label>Stripe Price ID (Yearly)</label>
+                        <input type="text" id="addPlanStripeYearly" placeholder="price_xxx">
+                    </div>
+                </div>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: center;">
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="addPlanIsPopular" style="width: auto;">
+                            Mark as Popular Plan
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="addPlanIsActive" style="width: auto;" checked>
+                            Plan is Active
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Features (one per line)</label>
+                    <textarea id="addPlanFeatures" rows="5" placeholder="Up to 5 trustees&#10;3 committees&#10;5GB storage&#10;Email support"></textarea>
+                    <span class="help-text">Enter each feature on a new line</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddPlanModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitAddPlan()">
+                    <i class="fas fa-plus"></i> Create Plan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Plan Modal -->
+    <div class="modal-overlay" id="editPlanModal" style="display: none;">
+        <div class="modal" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Edit Subscription Plan</h2>
+                <button class="modal-close" onclick="closeEditPlanModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editPlanId">
+                <div class="form-row" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Plan Name *</label>
+                        <input type="text" id="editPlanName" placeholder="e.g., Professional">
+                    </div>
+                    <div class="form-group">
+                        <label>Slug *</label>
+                        <input type="text" id="editPlanSlug" placeholder="e.g., professional" style="text-transform: lowercase;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="editPlanDescription" placeholder="Brief description of the plan">
+                </div>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label id="editPlanMonthlyLabel">Monthly Price (£) *</label>
+                        <input type="number" id="editPlanPriceMonthly" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label id="editPlanYearlyLabel">Yearly Price (£) *</label>
+                        <input type="number" id="editPlanPriceYearly" min="0" step="0.01">
+                        <span class="help-text">Usually 10x monthly (2 months free)</span>
+                    </div>
+                </div>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Max Users *</label>
+                        <input type="number" id="editPlanMaxUsers" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Committees</label>
+                        <input type="number" id="editPlanMaxCommittees" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Storage (MB)</label>
+                        <input type="number" id="editPlanMaxStorage" min="1">
+                        <span class="help-text">1024 = 1GB</span>
+                    </div>
+                </div>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Stripe Price ID (Monthly)</label>
+                        <input type="text" id="editPlanStripeMonthly" placeholder="price_xxx">
+                    </div>
+                    <div class="form-group">
+                        <label>Stripe Price ID (Yearly)</label>
+                        <input type="text" id="editPlanStripeYearly" placeholder="price_xxx">
+                    </div>
+                </div>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: center;">
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="editPlanIsPopular" style="width: auto;">
+                            Mark as Popular Plan
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="editPlanIsActive" style="width: auto;" checked>
+                            Plan is Active
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Features (one per line)</label>
+                    <textarea id="editPlanFeatures" rows="5" placeholder="Up to 25 trustees&#10;10 committees&#10;50GB storage&#10;Priority support"></textarea>
+                    <span class="help-text">Enter each feature on a new line</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeEditPlanModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitEditPlan()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.status-indicator.active {
+    background: #22c55e;
+}
+</style>

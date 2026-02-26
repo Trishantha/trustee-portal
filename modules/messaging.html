@@ -1,0 +1,33 @@
+<!-- Messaging Module -->
+<div class="module-section" id="messaging">
+    <div class="messaging-layout">
+        <div class="conversations-list" id="conversationsList">
+            <!-- Conversations loaded dynamically from API -->
+            <div style="padding: 2rem; text-align: center; color: var(--text-light);">
+                <i class="fas fa-comments" style="font-size: 1.5rem; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+                <p>Loading conversations...</p>
+            </div>
+        </div>
+        <div class="chat-area">
+            <div class="chat-header">
+                <button class="back-btn" onclick="backToConversations()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <span id="chatTitle">Select a conversation</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages loaded dynamically -->
+                <div style="padding: 3rem; text-align: center; color: var(--text-light);">
+                    <i class="fas fa-comment-dots" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                    <p>Select a conversation to start messaging</p>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="Type your message..." id="messageInput" disabled>
+                <button class="btn btn-primary" style="padding: 0.5rem 1rem;" onclick="sendMessage()" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

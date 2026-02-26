@@ -1,0 +1,496 @@
+<!-- Recruitment Module -->
+<div class="module-section" id="recruitment">
+    
+    <!-- Recruitment Tabs -->
+    <div class="recruitment-tabs">
+        <button class="recruitment-tab active" onclick="showRecruitmentTab('openings', this)">
+            <i class="fas fa-briefcase"></i> Job Openings
+        </button>
+        <button class="recruitment-tab" onclick="showRecruitmentTab('applications', this)">
+            <i class="fas fa-users"></i> Applications
+            <span class="tab-badge" id="applicationsBadge">0</span>
+        </button>
+        <button class="recruitment-tab" onclick="showRecruitmentTab('shortlisted', this)">
+            <i class="fas fa-list-check"></i> Shortlisted
+            <span class="tab-badge" id="shortlistedBadge">0</span>
+        </button>
+        <button class="recruitment-tab" onclick="showRecruitmentTab('interview', this)">
+            <i class="fas fa-comments"></i> Interview
+            <span class="tab-badge" id="interviewBadge">0</span>
+        </button>
+        <button class="recruitment-tab" onclick="showRecruitmentTab('selected', this)">
+            <i class="fas fa-user-check"></i> Selected
+            <span class="tab-badge" id="selectedBadge">0</span>
+        </button>
+    </div>
+
+    <!-- TAB 1: Job Openings -->
+    <div class="recruitment-content active" id="tab-openings">
+        <div class="flex justify-between items-center mb-4">
+            <h2 style="font-size: 1.25rem; font-weight: 700;">Active Job Openings</h2>
+            <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem; width: auto;" onclick="openCreateJobModal()">
+                <i class="fas fa-plus"></i> Create New Opening
+            </button>
+        </div>
+
+        <div class="job-listings" id="jobListings">
+            <!-- Job openings loaded dynamically from API -->
+            <div style="padding: 3rem; text-align: center; color: var(--text-light);">
+                <i class="fas fa-briefcase" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p>Loading job openings...</p>
+            </div>
+        </div>
+
+        <!-- Closed Positions -->
+        <div class="card mt-4">
+            <div class="card-header" onclick="toggleClosedJobs()" style="cursor: pointer;">
+                <h3><i class="fas fa-history"></i> Closed Positions <span id="closedJobsCount">(0)</span></h3>
+                <i class="fas fa-chevron-down" id="closedJobsIcon"></i>
+            </div>
+            <div class="card-body" id="closedJobsList" style="display: none; padding: 0;">
+                <!-- Closed jobs loaded dynamically -->
+                <p class="empty-state" id="noClosedJobsMsg">No closed positions</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: Applications -->
+    <div class="recruitment-content" id="tab-applications">
+        <div class="flex justify-between items-center mb-4">
+            <h2 style="font-size: 1.25rem; font-weight: 700;">All Applications</h2>
+            <div class="flex gap-2">
+                <select class="btn btn-secondary" id="positionFilter" style="font-size: 0.85rem; padding: 0.5rem 1rem; width: auto;">
+                    <option value="">All Positions</option>
+                    <!-- Options loaded dynamically -->
+                </select>
+                <button class="btn btn-secondary" style="padding: 0.5rem; font-size: 0.85rem; width: auto;">
+                    <i class="fas fa-filter"></i>
+                </button>
+                <button class="btn btn-secondary" style="padding: 0.5rem; font-size: 0.85rem; width: auto;">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="applications-list" id="applicationsList">
+            <!-- Applications loaded dynamically -->
+            <div class="empty-state" id="noApplicationsMsg">
+                <i class="fas fa-inbox" style="font-size: 3rem; color: var(--border); margin-bottom: 1rem;"></i>
+                <p>No applications received yet</p>
+                <p style="font-size: 0.85rem; color: var(--text-light);">Share job links with potential candidates</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: Shortlisted -->
+    <div class="recruitment-content" id="tab-shortlisted">
+        <div class="flex justify-between items-center mb-4">
+            <h2 style="font-size: 1.25rem; font-weight: 700;">Shortlisted Candidates</h2>
+            <div class="flex gap-2">
+                <button class="btn btn-primary" style="width: auto;" onclick="showToast('Upload feature coming soon', 'success')">
+                    <i class="fas fa-upload"></i> Upload Candidates
+                </button>
+                <button class="btn btn-secondary" style="width: auto;" onclick="showToast('Exporting shortlisted candidates...', 'success')">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body" style="padding: 0;">
+                <table class="shortlist-table" id="shortlistedTable">
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Position</th>
+                            <th>Interview Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shortlistedTableBody">
+                        <!-- Shortlisted candidates loaded dynamically -->
+                    </tbody>
+                </table>
+                <div class="empty-state" id="noShortlistedMsg" style="padding: 3rem;">
+                    <i class="fas fa-clipboard-list" style="font-size: 3rem; color: var(--border); margin-bottom: 1rem;"></i>
+                    <p>No shortlisted candidates yet</p>
+                    <p style="font-size: 0.85rem; color: var(--text-light);">Shortlist candidates from the Applications tab</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: Interview -->
+    <div class="recruitment-content" id="tab-interview">
+        <div class="flex justify-between items-center mb-4">
+            <h2 style="font-size: 1.25rem; font-weight: 700;">Interview Schedule</h2>
+            <button class="btn btn-secondary" style="width: auto;" onclick="showToast('Refreshing interviews...', 'success')">
+                <i class="fas fa-sync"></i> Refresh
+            </button>
+        </div>
+
+        <div class="interviews-list" id="interviewsList">
+            <!-- Interview cards loaded dynamically -->
+        </div>
+        
+        <div class="empty-state" id="noInterviewsMsg" style="padding: 3rem;">
+            <i class="fas fa-comments" style="font-size: 3rem; color: var(--border); margin-bottom: 1rem;"></i>
+            <p>No interviews scheduled</p>
+            <p style="font-size: 0.85rem; color: var(--text-light);">Schedule interviews from the Shortlisted tab</p>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3><i class="fas fa-info-circle"></i> Interview Process</h3>
+            </div>
+            <div class="card-body">
+                <div class="process-steps">
+                    <div class="step active">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Schedule Interview</h4>
+                            <p>Set date, time and panel members for the interview</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Conduct Interview</h4>
+                            <p>Panel interview with structured questions</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Panel Scoring</h4>
+                            <p>Score candidates and provide feedback</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Decision</h4>
+                            <p>Select, reject, or move to next round</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 5: Selected Candidates -->
+    <div class="recruitment-content" id="tab-selected">
+        <div class="flex justify-between items-center mb-4">
+            <h2 style="font-size: 1.25rem; font-weight: 700;">Selected Candidates</h2>
+            <button class="btn btn-secondary" style="width: auto;" onclick="showToast('Generating recruitment report...', 'success')">
+                <i class="fas fa-file-pdf"></i> Generate Report
+            </button>
+        </div>
+
+        <div class="selected-candidates" id="selectedCandidates">
+            <!-- Selected candidates loaded dynamically -->
+        </div>
+        
+        <div class="empty-state" id="noSelectedMsg" style="padding: 3rem;">
+            <i class="fas fa-user-check" style="font-size: 3rem; color: var(--border); margin-bottom: 1rem;"></i>
+            <p>No selected candidates yet</p>
+            <p style="font-size: 0.85rem; color: var(--text-light);">Select candidates from the Interview tab</p>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3><i class="fas fa-tasks"></i> Recruitment Checklist</h3>
+            </div>
+            <div class="card-body" style="padding: 0;" id="recruitmentChecklist">
+                <div class="checklist-item">
+                    <div class="checklist-checkbox" onclick="toggleChecklistItem(this)">
+                        <i class="fas fa-check" style="font-size: 0.7rem; opacity: 0;"></i>
+                    </div>
+                    <div class="checklist-content">
+                        <h4>Application Review</h4>
+                        <p>CV and cover letter reviewed by committee</p>
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-checkbox" onclick="toggleChecklistItem(this)">
+                        <i class="fas fa-check" style="font-size: 0.7rem; opacity: 0;"></i>
+                    </div>
+                    <div class="checklist-content">
+                        <h4>Interview Completed</h4>
+                        <p>Panel interview conducted</p>
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-checkbox" onclick="toggleChecklistItem(this)">
+                        <i class="fas fa-check" style="font-size: 0.7rem; opacity: 0;"></i>
+                    </div>
+                    <div class="checklist-content">
+                        <h4>Biometric Verification</h4>
+                        <p>Identity verified and DBS check completed</p>
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-checkbox" onclick="toggleChecklistItem(this)">
+                        <i class="fas fa-check" style="font-size: 0.7rem; opacity: 0;"></i>
+                    </div>
+                    <div class="checklist-content">
+                        <h4>Reference Checks</h4>
+                        <p>Professional references verified</p>
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-checkbox" onclick="toggleChecklistItem(this)">
+                        <i class="fas fa-check" style="font-size: 0.7rem; opacity: 0;"></i>
+                    </div>
+                    <div class="checklist-content">
+                        <h4>Board Approval</h4>
+                        <p>Pending Board ratification</p>
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-checkbox" onclick="toggleChecklistItem(this)">
+                        <i class="fas fa-check" style="font-size: 0.7rem; opacity: 0;"></i>
+                    </div>
+                    <div class="checklist-content">
+                        <h4>Offer Letter Sent</h4>
+                        <p>Formal offer letter issued</p>
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-checkbox" onclick="toggleChecklistItem(this)">
+                        <i class="fas fa-check" style="font-size: 0.7rem; opacity: 0;"></i>
+                    </div>
+                    <div class="checklist-content">
+                        <h4>Onboarding Initiated</h4>
+                        <p>Add to onboarding workflow</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Job Modal -->
+    <div class="modal-overlay" id="createJobModal" style="display: none;">
+        <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2 id="jobModalTitle">Create New Job Opening</h2>
+                <button class="modal-close" onclick="closeCreateJobModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editJobId" value="">
+                <div class="form-group">
+                    <label>Job Title *</label>
+                    <input type="text" id="jobTitle" placeholder="e.g., Trustee - Finance Committee" style="width: 100%;">
+                </div>
+                <div class="form-group">
+                    <label>Department/Committee *</label>
+                    <select id="jobDepartment" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem;">
+                        <option value="">Select Committee...</option>
+                        <!-- Options loaded dynamically -->
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <select id="jobLocation" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem;">
+                            <option value="">Select...</option>
+                            <option>London</option>
+                            <option>Remote</option>
+                            <option>Hybrid</option>
+                            <option>Manchester</option>
+                            <option>Birmingham</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Time Commitment *</label>
+                        <select id="jobTime" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem;">
+                            <option value="">Select...</option>
+                            <option>1 day/week</option>
+                            <option>2 days/week</option>
+                            <option>3 days/week</option>
+                            <option>4 days/week</option>
+                            <option>Full Time</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Application Expiry Date *</label>
+                        <input type="date" id="jobExpiry" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem;">
+                    </div>
+                    <div class="form-group">
+                        <label>Salary/Remuneration</label>
+                        <select id="jobSalary" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem;">
+                            <option>Unpaid/Volunteer</option>
+                            <option>Expenses Only</option>
+                            <option>£15,000 - £20,000</option>
+                            <option>£20,000 - £30,000</option>
+                            <option>£30,000+</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Job Description *</label>
+                    <textarea id="jobDescription" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; min-height: 120px; font-family: Inter, sans-serif; font-size: 1rem; resize: vertical;" placeholder="Enter detailed job description including responsibilities, key duties, and what the role involves..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Required Qualifications *</label>
+                    <textarea id="jobRequirements" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; min-height: 100px; font-family: Inter, sans-serif; font-size: 1rem; resize: vertical;" placeholder="List required qualifications, skills, and experience..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Additional Information</label>
+                    <textarea id="jobAdditional" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; min-height: 80px; font-family: Inter, sans-serif; font-size: 1rem; resize: vertical;" placeholder="Any other relevant information about the role..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCreateJobModal()" style="width: auto;">Cancel</button>
+                <button class="btn btn-primary" id="jobModalSubmitBtn" onclick="postJobOpening()" style="width: auto; background: var(--success);">
+                    <i class="fas fa-paper-plane"></i> Post Job Opening
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Application Modal -->
+    <div class="modal-overlay" id="viewApplicationModal" style="display: none;">
+        <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>Application Details</h2>
+                <button class="modal-close" onclick="closeViewApplicationModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="viewAppId">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; background: var(--bg); border-radius: 8px;">
+                    <div class="applicant-avatar" id="viewAppAvatar" style="width: 64px; height: 64px; font-size: 1.5rem;">--</div>
+                    <div>
+                        <h3 id="viewAppName" style="margin: 0;">Loading...</h3>
+                        <p id="viewAppPosition" style="margin: 0; color: var(--text-light);">Loading...</p>
+                        <span class="status-badge" id="viewAppStatus">New</span>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <p id="viewAppEmail" style="margin: 0; padding: 0.5rem; background: var(--bg); border-radius: 4px;">-</p>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-phone"></i> Phone</label>
+                        <p id="viewAppPhone" style="margin: 0; padding: 0.5rem; background: var(--bg); border-radius: 4px;">-</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Applied Date</label>
+                    <p id="viewAppDate" style="margin: 0; padding: 0.5rem; background: var(--bg); border-radius: 4px;">-</p>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-file-alt"></i> Cover Letter / Personal Statement</label>
+                    <div id="viewAppCoverLetter" style="padding: 1rem; background: var(--bg); border-radius: 8px; min-height: 100px; white-space: pre-wrap;">-</div>
+                </div>
+                
+                <div class="form-group" id="viewAppCVSection" style="display: none;">
+                    <label><i class="fas fa-paperclip"></i> CV / Resume</label>
+                    <div style="padding: 1rem; background: var(--bg); border-radius: 8px;">
+                        <a href="#" id="viewAppCV" target="_blank" class="btn btn-secondary" style="width: auto;">
+                            <i class="fas fa-download"></i> Download CV
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeViewApplicationModal()" style="width: auto;">Close</button>
+                <button class="btn btn-danger" onclick="rejectCurrentApplication()" style="width: auto;">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+                <button class="btn btn-success" onclick="shortlistCurrentApplication()" style="width: auto;">
+                    <i class="fas fa-list"></i> Shortlist
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Interview Modal -->
+    <div class="modal-overlay" id="scheduleInterviewModal" style="display: none;">
+        <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>Schedule Interview</h2>
+                <button class="modal-close" onclick="closeScheduleInterviewModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="scheduleCandidateId">
+                <input type="hidden" id="scheduleJobId">
+                
+                <div class="form-group">
+                    <label>Candidate</label>
+                    <p id="scheduleCandidateName" style="margin: 0; padding: 0.75rem; background: var(--bg); border-radius: 8px; font-weight: 600;">-</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Interview Date & Time *</label>
+                        <input type="datetime-local" id="interviewDateTime" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px;">
+                    </div>
+                    <div class="form-group">
+                        <label>Duration (minutes) *</label>
+                        <select id="interviewDuration" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px;">
+                            <option value="30">30 minutes</option>
+                            <option value="45">45 minutes</option>
+                            <option value="60" selected>1 hour</option>
+                            <option value="90">1.5 hours</option>
+                            <option value="120">2 hours</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Interview Type *</label>
+                    <select id="interviewType" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px;">
+                        <option value="in_person">In Person</option>
+                        <option value="video">Video Call</option>
+                        <option value="phone">Phone</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Location / Meeting Link</label>
+                    <input type="text" id="interviewLocation" placeholder="e.g., Board Room A or Zoom link" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px;">
+                </div>
+                
+                <div class="form-group">
+                    <label>Interview Panel * (Select Interviewers)</label>
+                    <div id="interviewersList" style="max-height: 200px; overflow-y: auto; border: 2px solid var(--border); border-radius: 8px; padding: 0.5rem;">
+                        <p style="color: var(--text-light); text-align: center; padding: 1rem;">Loading interviewers...</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="interviewNotes" rows="3" placeholder="Any specific notes for the interview..." style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px;"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="addToCalendar" checked style="width: auto;">
+                        <span>Add to Calendar</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeScheduleInterviewModal()" style="width: auto;">Cancel</button>
+                <button class="btn btn-primary" onclick="submitInterviewSchedule()" style="width: auto;">
+                    <i class="fas fa-calendar-check"></i> Schedule Interview
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

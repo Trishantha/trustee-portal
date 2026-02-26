@@ -1,0 +1,1130 @@
+<!-- Setup Wizard - First Time Organization Setup -->
+<div class="setup-wizard-wrapper">
+    <div class="setup-wizard-container">
+        <!-- Progress Header -->
+        <div class="wizard-header">
+            <div class="wizard-logo">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <h1>Welcome to Trustee Portal!</h1>
+            <p>Let's get your organization set up in just a few steps</p>
+            
+            <!-- Progress Bar -->
+            <div class="wizard-progress">
+                <div class="progress-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Organization</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Committees</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Members</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-label">Complete</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Organization Details -->
+        <div class="wizard-step active" id="step1">
+            <div class="wizard-card">
+                <div class="wizard-card-header">
+                    <div class="icon-circle primary">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div>
+                        <h2>Organization Details</h2>
+                        <p>Tell us about your organization</p>
+                    </div>
+                </div>
+                
+                <div class="wizard-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Organization Name *</label>
+                            <input type="text" id="setupOrgName" placeholder="e.g., Hope & Help Charity">
+                            <span class="help-text">This will appear throughout the portal</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Website URL</label>
+                            <input type="url" id="setupOrgWebsite" placeholder="https://www.example.org">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Billing Email *</label>
+                            <input type="email" id="setupOrgEmail" placeholder="admin@example.org">
+                            <span class="help-text">For invoices and important notifications</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="setupOrgPhone" placeholder="+44 20 1234 5678">
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Organization Address</label>
+                        <textarea id="setupOrgAddress" rows="3" placeholder="Enter your organization's address..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Custom Domain (Optional)</label>
+                            <div class="domain-input">
+                                <input type="text" id="setupOrgDomain" placeholder="portal">
+                                <span class="domain-suffix">.yourdomain.com</span>
+                            </div>
+                            <span class="help-text">You can set this up later with your IT team</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Organization Slug *</label>
+                            <div class="slug-input">
+                                <input type="text" id="setupOrgSlug" placeholder="your-org">
+                                <button class="btn btn-secondary btn-sm" onclick="checkSlugAvailability()">
+                                    <i class="fas fa-check"></i> Check
+                                </button>
+                            </div>
+                            <span class="help-text">Used for your URL: your-org.trusteeportal.com</span>
+                            <span id="slugStatus" class="slug-status"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Organization Description</label>
+                        <textarea id="setupOrgDescription" rows="2" placeholder="Brief description of your organization..."></textarea>
+                    </div>
+
+                    <!-- Trustee Term Settings -->
+                    <div class="form-section" style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+                        <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-user-clock" style="color: var(--primary);"></i>
+                            Trustee Term Settings
+                        </h3>
+                        <p style="color: var(--text-light); margin-bottom: 1.5rem; font-size: 0.9rem;">
+                            Configure default term length and renewal policies for trustees
+                        </p>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Default Trustee Term Length *</label>
+                                <select id="setupDefaultTermLength">
+                                    <option value="1">1 Year</option>
+                                    <option value="2">2 Years</option>
+                                    <option value="3" selected>3 Years</option>
+                                    <option value="4">4 Years</option>
+                                    <option value="5">5 Years</option>
+                                    <option value="6">6 Years</option>
+                                </select>
+                                <span class="help-text">Default term for new trustees</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Maximum Consecutive Terms</label>
+                                <select id="setupMaxConsecutiveTerms">
+                                    <option value="0">No limit</option>
+                                    <option value="1">1 Term</option>
+                                    <option value="2" selected>2 Terms</option>
+                                    <option value="3">3 Terms</option>
+                                </select>
+                                <span class="help-text">Limit consecutive reappointments</span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Renewal Notification (Days Before)</label>
+                                <select id="setupRenewalNotificationDays">
+                                    <option value="30">30 days</option>
+                                    <option value="60">60 days</option>
+                                    <option value="90" selected>90 days</option>
+                                    <option value="180">180 days</option>
+                                </select>
+                                <span class="help-text">When to notify about term ending</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Auto-Renewal</label>
+                                <select id="setupAutoRenewal">
+                                    <option value="disabled">Disabled - Manual renewal only</option>
+                                    <option value="chair_approval" selected>Enabled - Requires chair approval</option>
+                                    <option value="board_vote">Enabled - Requires board vote</option>
+                                </select>
+                                <span class="help-text">Automatic renewal process</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="setupEnableTermTracking" checked style="width: auto;">
+                                <span>Enable automatic term tracking and notifications</span>
+                            </label>
+                            <span class="help-text">System will track trustee terms and send renewal/expiration notifications to chairs and admins</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-actions">
+                    <button class="btn btn-primary btn-lg" onclick="saveStep1()">
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Setup Committees -->
+        <div class="wizard-step" id="step2">
+            <div class="wizard-card">
+                <div class="wizard-card-header">
+                    <div class="icon-circle success">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <div>
+                        <h2>Create Committees</h2>
+                        <p>Set up your board committees</p>
+                    </div>
+                </div>
+
+                <div class="committees-setup">
+                    <p class="setup-intro">Common committees for governance boards. Select the ones you need:</p>
+                    
+                    <div class="committee-presets">
+                        <div class="preset-card" data-committee="board">
+                            <div class="preset-checkbox">
+                                <input type="checkbox" id="presetBoard" checked>
+                            </div>
+                            <div class="preset-info">
+                                <h4><i class="fas fa-building"></i> Board of Trustees</h4>
+                                <p>Main governing body of the organization</p>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" data-committee="finance">
+                            <div class="preset-checkbox">
+                                <input type="checkbox" id="presetFinance" checked>
+                            </div>
+                            <div class="preset-info">
+                                <h4><i class="fas fa-chart-line"></i> Finance & Audit</h4>
+                                <p>Financial oversight and audit matters</p>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" data-committee="people">
+                            <div class="preset-checkbox">
+                                <input type="checkbox" id="presetPeople">
+                            </div>
+                            <div class="preset-info">
+                                <h4><i class="fas fa-users"></i> People & Remuneration</h4>
+                                <p>HR, staffing, and compensation</p>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" data-committee="fundraising">
+                            <div class="preset-checkbox">
+                                <input type="checkbox" id="presetFundraising">
+                            </div>
+                            <div class="preset-info">
+                                <h4><i class="fas fa-hand-holding-heart"></i> Fundraising</h4>
+                                <p>Development and fundraising strategy</p>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" data-committee="safeguarding">
+                            <div class="preset-checkbox">
+                                <input type="checkbox" id="presetSafeguarding" checked>
+                            </div>
+                            <div class="preset-info">
+                                <h4><i class="fas fa-shield-alt"></i> Safeguarding</h4>
+                                <p>Child and vulnerable adult protection</p>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" data-committee="property">
+                            <div class="preset-checkbox">
+                                <input type="checkbox" id="presetProperty">
+                            </div>
+                            <div class="preset-info">
+                                <h4><i class="fas fa-home"></i> Property & Assets</h4>
+                                <p>Facilities and asset management</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="add-custom-committee">
+                        <button class="btn btn-secondary" onclick="addCustomCommittee()">
+                            <i class="fas fa-plus"></i> Add Custom Committee
+                        </button>
+                    </div>
+
+                    <div id="customCommitteesList" class="custom-committees-list"></div>
+                </div>
+
+                <div class="wizard-actions">
+                    <button class="btn btn-secondary" onclick="goToStep(1)">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn btn-primary btn-lg" onclick="saveStep2()">
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Import Members -->
+        <div class="wizard-step" id="step3">
+            <div class="wizard-card">
+                <div class="wizard-card-header">
+                    <div class="icon-circle purple">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <h2>Add Members</h2>
+                        <p>Invite your trustees and committee members</p>
+                    </div>
+                </div>
+
+                <div class="members-setup">
+                    <div class="import-tabs">
+                        <button class="import-tab active" onclick="switchImportTab('manual', this)">
+                            <i class="fas fa-keyboard"></i> Manual Entry
+                        </button>
+                        <button class="import-tab" onclick="switchImportTab('bulk', this)">
+                            <i class="fas fa-file-csv"></i> Bulk Import
+                        </button>
+                        <button class="import-tab" onclick="switchImportTab('invite', this)">
+                            <i class="fas fa-envelope"></i> Send Invites
+                        </button>
+                    </div>
+
+                    <!-- Manual Entry -->
+                    <div class="import-content active" id="importManual">
+                        <p class="setup-intro">Add members one by one:</p>
+                        
+                        <div id="manualMembersList">
+                            <div class="member-form-row" data-index="0">
+                                <div class="form-group">
+                                    <input type="text" placeholder="First Name" class="member-firstname">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" placeholder="Last Name" class="member-lastname">
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" placeholder="Email Address" class="member-email">
+                                </div>
+                                <div class="form-group">
+                                    <select class="member-role">
+                                        <option value="trustee">Trustee</option>
+                                        <option value="chair">Chair</option>
+                                        <option value="secretary">Secretary</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-danger btn-sm" onclick="removeMemberRow(this)" style="display: none;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-secondary" onclick="addMemberRow()">
+                            <i class="fas fa-plus"></i> Add Another Member
+                        </button>
+                    </div>
+
+                    <!-- Bulk Import -->
+                    <div class="import-content" id="importBulk">
+                        <div class="bulk-import-area">
+                            <div class="upload-zone-large" id="csvUploadZone" onclick="document.getElementById('csvFileInput').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h3>Upload CSV File</h3>
+                                <p>Drag and drop your CSV file here, or click to browse</p>
+                                <span class="file-types">Supports: .csv, .xlsx</span>
+                                <input type="file" id="csvFileInput" accept=".csv,.xlsx" style="display: none;" onchange="handleCSVUpload(event)">
+                            </div>
+
+                            <div class="csv-template">
+                                <p>Need a template? <a href="#" onclick="downloadCSVTemplate()">Download sample CSV</a></p>
+                                <div class="template-preview">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>first_name</th>
+                                                <th>last_name</th>
+                                                <th>email</th>
+                                                <th>role</th>
+                                                <th>committee</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>John</td>
+                                                <td>Smith</td>
+                                                <td>john@example.com</td>
+                                                <td>chair</td>
+                                                <td>Board of Trustees</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Jane</td>
+                                                <td>Doe</td>
+                                                <td>jane@example.com</td>
+                                                <td>trustee</td>
+                                                <td>Finance & Audit</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="csvPreview" class="csv-preview" style="display: none;">
+                            <h4>Preview (<span id="csvRowCount">0</span> members found)</h4>
+                            <div class="preview-table-container">
+                                <table id="csvPreviewTable"></table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Send Invites -->
+                    <div class="import-content" id="importInvite">
+                        <div class="invite-options">
+                            <div class="invite-option-card">
+                                <i class="fas fa-envelope-open-text"></i>
+                                <h4>Send Email Invitations</h4>
+                                <p>Members will receive an email with a link to join and set up their account</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="sendEmailInvites" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="invite-option-card">
+                                <i class="fas fa-link"></i>
+                                <h4>Generate Join Links</h4>
+                                <p>Create shareable links that members can use to join</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="generateJoinLinks">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="invite-option-card">
+                                <i class="fas fa-user-check"></i>
+                                <h4>Skip for Now</h4>
+                                <p>Add members later from the admin panel</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="skipInvites">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-actions">
+                    <button class="btn btn-secondary" onclick="goToStep(2)">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn btn-primary btn-lg" onclick="saveStep3()">
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Complete -->
+        <div class="wizard-step" id="step4">
+            <div class="wizard-card text-center">
+                <div class="completion-animation">
+                    <div class="success-circle">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+                
+                <h2>You're All Set!</h2>
+                <p class="completion-message">Your organization is now configured and ready to use.</p>
+
+                <div class="setup-summary" id="setupSummary">
+                    <!-- Summary populated dynamically -->
+                </div>
+
+                <div class="quick-tips">
+                    <h3><i class="fas fa-lightbulb"></i> Quick Tips</h3>
+                    <div class="tips-grid">
+                        <div class="tip-card">
+                            <i class="fas fa-calendar-plus"></i>
+                            <p>Schedule your first board meeting</p>
+                        </div>
+                        <div class="tip-card">
+                            <i class="fas fa-tasks"></i>
+                            <p>Create tasks for committee members</p>
+                        </div>
+                        <div class="tip-card">
+                            <i class="fas fa-file-upload"></i>
+                            <p>Upload important documents</p>
+                        </div>
+                        <div class="tip-card">
+                            <i class="fas fa-cog"></i>
+                            <p>Customize settings in Admin panel</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-actions">
+                    <button class="btn btn-primary btn-lg" onclick="completeSetup()">
+                        <i class="fas fa-rocket"></i> Launch Portal
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skip Option -->
+        <div class="wizard-skip">
+            <button class="btn btn-link" onclick="skipSetup()">
+                <i class="fas fa-pause-circle"></i> Skip for now
+            </button>
+            <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem;">
+                You can restart anytime from Admin → System Settings
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+.setup-wizard-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.wizard-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.wizard-logo {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: white;
+    font-size: 2rem;
+}
+
+.wizard-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.wizard-header p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+}
+
+/* Progress Steps */
+.wizard-progress {
+    margin-top: 2rem;
+}
+
+.progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.step.active {
+    opacity: 1;
+}
+
+.step.completed {
+    opacity: 1;
+}
+
+.step.completed .step-number {
+    background: var(--success);
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-light);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.step-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.step-line {
+    width: 60px;
+    height: 2px;
+    background: var(--border);
+    margin: 0 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Wizard Steps */
+.wizard-step {
+    display: none;
+}
+
+.wizard-step.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Wizard Card */
+.wizard-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.wizard-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.icon-circle.primary {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.icon-circle.success {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.icon-circle.purple {
+    background: var(--purple-light);
+    color: var(--purple);
+}
+
+.wizard-card-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.wizard-card-header p {
+    color: var(--text-light);
+}
+
+/* Form Styles */
+.wizard-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.help-text {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.domain-input,
+.slug-input {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.domain-suffix {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.slug-input button {
+    white-space: nowrap;
+}
+
+.slug-status {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+}
+
+.slug-status.available {
+    color: var(--success);
+}
+
+.slug-status.taken {
+    color: var(--danger);
+}
+
+/* Committee Presets */
+.setup-intro {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
+.committee-presets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.preset-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.preset-card:hover {
+    border-color: var(--primary);
+    background: var(--bg-light);
+}
+
+.preset-card input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.preset-info h4 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.preset-info p {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.add-custom-committee {
+    margin-bottom: 1rem;
+}
+
+/* Import Tabs */
+.import-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+}
+
+.import-tab {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: transparent;
+    color: var(--text-light);
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.import-tab:hover {
+    background: var(--bg-light);
+}
+
+.import-tab.active {
+    background: var(--primary);
+    color: white;
+}
+
+.import-content {
+    display: none;
+}
+
+.import-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Member Form Rows */
+.member-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-light);
+    border-radius: 8px;
+}
+
+.member-form-row input,
+.member-form-row select {
+    margin: 0;
+}
+
+/* Bulk Import */
+.upload-zone-large {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 3rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 1.5rem;
+}
+
+.upload-zone-large:hover {
+    border-color: var(--primary);
+    background: var(--bg-light);
+}
+
+.upload-zone-large i {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.upload-zone-large h3 {
+    margin-bottom: 0.5rem;
+}
+
+.upload-zone-large p {
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.file-types {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.csv-template {
+    background: var(--bg-light);
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.csv-template table {
+    width: 100%;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    border-collapse: collapse;
+}
+
+.csv-template th,
+.csv-template td {
+    padding: 0.5rem;
+    text-align: left;
+    border: 1px solid var(--border);
+}
+
+.csv-template th {
+    background: var(--card);
+    font-weight: 600;
+}
+
+/* Invite Options */
+.invite-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.invite-option-card {
+    padding: 1.5rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.invite-option-card:hover {
+    border-color: var(--primary);
+}
+
+.invite-option-card i {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.invite-option-card h4 {
+    margin-bottom: 0.5rem;
+}
+
+.invite-option-card p {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border);
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+/* Completion */
+.text-center {
+    text-align: center;
+}
+
+.completion-animation {
+    margin-bottom: 2rem;
+}
+
+.success-circle {
+    width: 100px;
+    height: 100px;
+    background: var(--success);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    color: white;
+    font-size: 3rem;
+    animation: scaleIn 0.5s ease;
+}
+
+@keyframes scaleIn {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.completion-message {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.setup-summary {
+    background: var(--bg-light);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.quick-tips {
+    margin-bottom: 2rem;
+}
+
+.quick-tips h3 {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.tip-card {
+    padding: 1.5rem 1rem;
+    background: var(--bg-light);
+    border-radius: 12px;
+}
+
+.tip-card i {
+    font-size: 1.5rem;
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+}
+
+.tip-card p {
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* Wizard Actions */
+.wizard-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.btn-lg {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+}
+
+.wizard-skip {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.wizard-skip .btn-link {
+    color: var(--text-light);
+    text-decoration: none;
+}
+
+.wizard-skip .btn-link:hover {
+    color: var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .committee-presets {
+        grid-template-columns: 1fr;
+    }
+    
+    .member-form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .invite-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .tips-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .progress-steps {
+        flex-wrap: wrap;
+    }
+    
+    .step-line {
+        display: none;
+    }
+}
+</style>
